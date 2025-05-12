@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHive - Register</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="images/logo.webp" alt="SNUC Logo" class="logo logo-left">
+            <div class="title-container">
+                <h1 class="title">UniHive</h1>
+                <p class="subtitle">SSN & SNUC Community Hub</p>
+            </div>
+            <img src="images/logossn.jpg" alt="SSN Logo" class="logo logo-right">
+        </div>
+        <div class="decorative-line"></div>
+    </header>
+
+    <main>
+        <section class="signin-section">
+            <div class="signin-wrapper">
+                <h2>Create Your UniHive Account</h2>
+                <p>Register with your college email to join the SSN & SNUC Community Hub.</p>
+                <form id="register-form">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <input type="email" id="email" placeholder="Enter your college email" required>
+                    <input type="password" id="password" placeholder="Create a password" required>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    <button type="submit" class="submit-btn">Register</button>
+                </form>
+                <p id="error-message" class="error-message"></p>
+                <p>Already have an account? <a href="signin.html">Sign In</a></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 UniHive - SSN & SNUC. Not All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const phone = document.getElementById('phone').value;
+            const username = document.getElementById('username').value.trim();
+            const errorMessage = document.getElementById('error-message');
+
+            // Validate email domain
+            if (!email.endsWith('@snuchennai.edu.in') && !email.endsWith('@ssn.edu.in')) {
+                errorMessage.textContent = 'Please use a valid SNUC or SSN email address.';
+                return;
+            }
+
+            // Check if user already exists
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            if (users.some(user => user.email === email)) {
+                errorMessage.textContent = 'This email is already registered. Please sign in.';
+                return;
+            }
+
+            const user = {
+                email,
+                password,
+                phone,
+                username,
+                profilePic: null
+            };
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('isSignedIn', 'true');
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('username', username);
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHive - Sign In</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="images/logo.webp" alt="SNUC Logo" class="logo logo-left">
+            <div class="title-container">
+                <h1 class="title">UniHive</h1>
+                <p class="subtitle">SSN & SNUC Community Hub</p>
+            </div>
+            <img src="images/logossn.jpg" alt="SSN Logo" class="logo logo-right">
+        </div>
+        <div class="decorative-line"></div>
+    </header>
+
+    <main>
+        <section class="signin-section">
+            <div class="signin-wrapper">
+                <h2>Sign In to UniHive</h2>
+                <p>Access your SSN & SNUC Community Hub account.</p>
+                <form id="signin-form">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <input type="email" id="email" placeholder="Enter your college email" required>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+                <p id="error-message" class="error-message"></p>
+                <p>Don't have an account? <a href="register.html">Register</a></p>
+                <p>Forgot your password? <a href="forgot-password.html">Reset it</a></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 UniHive - SSN & SNUC. Not All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('signin-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(user => user.email === email && user.password === password);
+
+            if (user) {
+                if (user.username === username) {
+                    localStorage.setItem('isSignedIn', 'true');
+                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('username', username);
+                    window.location.href = 'index.html';
+                } else {
+                    errorMessage.textContent = 'Username does not match the email and password.';
+                }
+            } else {
+                errorMessage.textContent = 'Invalid email or password.';
+            }
+        });
+    </script>
+</body>
+</html>

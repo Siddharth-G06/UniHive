@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHive - SSN & SNUC Community Hub</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <script>
+        // Redirect to sign-in if not authenticated
+        if (localStorage.getItem('isSignedIn') !== 'true') {
+            window.location.href = 'signin.html';
+        }
+    </script>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-content">
+            <img src="images/logo.webp" alt="SNUC Logo" class="logo logo-left">
+            <div class="title-container">
+                <h1 class="title">UniHive</h1>
+                <p class="subtitle">SSN & SNUC Community Hub</p>
+            </div>
+            <img src="images/logossn.jpg" alt="SSN Logo" class="logo logo-right">
+        </div>
+        <div class="profile-container">
+            <img id="profile-pic" class="profile-pic" alt="Profile Picture">
+            <span id="profile-username" class="profile-username"></span>
+            <div id="profile-dropdown" class="profile-dropdown">
+                <button id="change-username-btn" class="dropdown-item">Change Username</button>
+                <label for="profile-pic-upload" class="dropdown-item">Set/Change Profile Picture</label>
+                <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+                <a href="change-password.html" class="dropdown-item">Change Password</a>
+                <button id="sign-out-btn" class="dropdown-item">Sign Out</button>
+            </div>
+        </div>
+        <div class="decorative-line"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="hero">
+            <h2>Welcome to UniHive!</h2>
+            <p>Your one-stop platform for everything campus—connect, share, and thrive!</p>
+            <div class="image-chain">
+                <img src="images/topv.jpg" alt="Top View" class="chain-image">
+                <img src="images/ct.jpg" alt="Campus Tour" class="chain-image">
+                <img src="images/entrance.jpg" alt="Entrance" class="chain-image">
+                <img src="images/fountain.jpg" alt="Campus Fountain" class="chain-image">
+                <img src="images/ctv.jpg" alt="Campus View" class="chain-image">
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <a href="lostfound.html" class="feature-card">
+                <h3>Lost & Found Hub</h3>
+                <p>Post or find lost items—keys, books, or gadgets!</p>
+                <img src="images/lostnfound.jpg" alt="Lost and Found" class="feature-image">
+            </a>
+            <div class="feature-card">
+                <h3>Service Exchange</h3>
+                <p>Rent cycles or swap skills with peers.</p>
+                <img src="images/service.jpg" alt="Service Exchange" class="feature-image">
+            </div>
+            <div class="feature-card">
+                <h3>Second-Hand Market</h3>
+                <p>Buy or sell books, gear, and more.</p>
+                <img src="images/market.jpg" alt="Second-Hand Market" class="feature-image">
+            </div>
+            <div class="feature-card">
+                <h3>Emergency Toolkit</h3>
+                <p>Quick help for lockouts or late-night rides.</p>
+                <img src="images/emg.png" alt="Emergency Toolkit" class="feature-image">
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 UniHive - SSN & SNUC. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load profile picture
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userEmail = localStorage.getItem('userEmail');
+            const username = localStorage.getItem('username');
+            const user = users.find(user => user.email === userEmail);
+            const profilePic = document.getElementById('profile-pic');
+            const profileUsername = document.getElementById('profile-username');
+            profileUsername.textContent = username || 'User';
+            if (user && user.profilePic) {
+                profilePic.src = user.profilePic;
+            } else {
+                profilePic.src = 'images/user.png';
+            }
+
+            // Toggle dropdown menu
+            function toggleDropdown() {
+                const dropdown = document.getElementById('profile-dropdown');
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            }
+
+            profilePic.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+
+            profileUsername.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+
+            // Handle profile picture upload
+            document.getElementById('profile-pic-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64Image = reader.result;
+                        profilePic.src = base64Image;
+
+                        const users = JSON.parse(localStorage.getItem('users')) || [];
+                        const userIndex = users.findIndex(user => user.email === userEmail);
+                        users[userIndex].profilePic = base64Image;
+                        localStorage.setItem('users', JSON.stringify(users));
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Sign out function
+            const signOutBtn = document.getElementById('sign-out-btn');
+            signOutBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                localStorage.removeItem('isSignedIn');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('username');
+                window.location.href = 'signin.html';
+            });
+
+            // Change username
+            const changeUsernameBtn = document.getElementById('change-username-btn');
+            changeUsernameBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdown = document.getElementById('profile-dropdown');
+                const newUsername = prompt('Enter your new username:');
+                if (newUsername && newUsername.trim()) {
+                    const users = JSON.parse(localStorage.getItem('users')) || [];
+                    const userIndex = users.findIndex(user => user.email === userEmail);
+                    if (userIndex !== -1) {
+                        users[userIndex].username = newUsername.trim();
+                        localStorage.setItem('users', JSON.stringify(users));
+                        localStorage.setItem('username', newUsername.trim());
+                        profileUsername.textContent = newUsername.trim();
+                        dropdown.style.display = 'none';
+                    }
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const dropdown = document.getElementById('profile-dropdown');
+                const profilePic = document.getElementById('profile-pic');
+                const profileUsername = document.getElementById('profile-username');
+                if (!profilePic.contains(e.target) && !profileUsername.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

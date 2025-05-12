@@ -1,0 +1,806 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    background: linear-gradient(135deg, #1e40af, #1047d3) !important;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styles */
+.header {
+    position: relative;
+    padding: 20px 0;
+    min-height: 150px;
+    background: none;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/snfountain.jpeg');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.5);
+    z-index: -1;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+}
+
+.logo-left {
+    width: 230px;
+    height: 70px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.logo-right {
+    width: 150px;
+    height: 50px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.title-container {
+    text-align: center;
+    color: #fbbf24;
+    flex-grow: 1;
+    padding: 0 120px;
+}
+
+.title {
+    font-size: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 2s ease-in-out;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #d1d5db;
+}
+
+.profile-container {
+    position: absolute;
+    top: 150px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #34d399;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin: 0;
+}
+
+.profile-pic:hover {
+    transform: scale(1.1);
+}
+
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 100px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    min-width: 400px;
+}
+
+.profile-username {
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+    color: #fbbf24;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.profile-username:hover {
+    color: #34d399;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 20px 30px;
+    color: #1e40af;
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: #f3f4f6;
+    color: #03133f;
+}
+
+.decorative-line {
+    height: 5px;
+    background: linear-gradient(to right, #00f2de, #f29109, #f36fb4);
+    margin-top: 40px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(251, 191, 36, 0.5);
+}
+
+/* Main Content */
+main {
+    background: transparent;
+}
+
+/* Sign-In Section */
+.signin-section {
+    padding: 40px 20px;
+    background: transparent;
+    text-align: center;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.signin-section a {
+    color: #000000;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.signin-section a:hover {
+    color: #d1d5db;
+}
+
+.signin-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.signin-section h2 {
+    font-size: 2.5rem;
+    color: #fbbf24;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.signin-section p {
+    font-size: 1.2rem;
+    color: #d1d5db;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+#signin-form,
+#register-form,
+#forgot-password-form,
+#change-password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+#signin-form:hover,
+#register-form:hover,
+#forgot-password-form:hover,
+#change-password-form:hover {
+    transform: translateY(-5px);
+}
+
+#signin-form input,
+#register-form input,
+#forgot-password-form input,
+#change-password-form input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #34d399;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#signin-form input:focus,
+#register-form input:focus,
+#forgot-password-form input:focus,
+#change-password-form input:focus {
+    outline: none;
+    border-color: #fbbf24;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+#signin-form input::placeholder,
+#register-form input::placeholder,
+#forgot-password-form input::placeholder,
+#change-password-form input::placeholder {
+    color: #d1d5db;
+    opacity: 1;
+}
+
+.error-message {
+    color: #f472b6;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+.submit-btn {
+    padding: 12px;
+    background: linear-gradient(45deg, #fbbf24, #f472b6);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(45deg, #f472b6, #fbbf24);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
+}
+
+/* Hero Section */
+.hero {
+    background: transparent;
+    text-align: center;
+    padding: 20px 20px;
+    margin: 10px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 350px;
+}
+
+.hero h2 {
+    font-size: 2.5rem;
+    color: #fbbf24;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+    font-size: 1.1rem;
+    color: #d1d5db;
+    margin-bottom: 20px;
+}
+
+.image-chain {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.chain-image {
+    width: 280px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #34d399;
+    transition: transform 0.3s ease;
+}
+
+.chain-image:hover {
+    transform: scale(1.05);
+}
+
+/* Features Section */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 40px 20px;
+    background: transparent;
+}
+
+.feature-card {
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1e40af;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid #fbbf24;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 300px;
+    text-decoration: none;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #1e3a8a;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.feature-image {
+    width: 100%;
+    max-width: 150px;
+    height: 100px;
+    object-fit: cover;
+    margin: 0 auto;
+    border-radius: 10px;
+    border: 2px solid #34d399;
+}
+
+/* Lost & Found Page */
+#lost-found {
+    padding: 40px 20px;
+    background: transparent;
+    text-align: center;
+    min-height: calc(100vh - 120px);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.lost-found-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#lost-found h2 {
+    font-size: 2.5rem;
+    color: #fbbf24;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+#lost-found p {
+    font-size: 1.2rem;
+    color: #d1d5db;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+#lost-found-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+#lost-found-form:hover {
+    transform: translateY(-5px);
+}
+
+#lost-found-form input,
+#lost-found-form textarea,
+#lost-found-form select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #34d399;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#lost-found-form input:focus,
+#lost-found-form textarea:focus,
+#lost-found-form select:focus {
+    outline: none;
+    border-color: #fbbf24;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+#lost-found-form input::placeholder,
+#lost-found-form textarea::placeholder {
+    color: #fdfeff;
+    opacity: 1;
+}
+
+#lost-found-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#lost-found-form select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #34d399 50%), linear-gradient(135deg, #34d399 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+    background-size: 10px 10px, 10px 10px;
+    background-repeat: no-repeat;
+    padding-right: 30px;
+}
+
+#lost-found-form select option {
+    background: #1e40af;
+    color: #d1d5db;
+    padding: 5px;
+}
+
+#lost-found-form .status-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    color: #d1d5db;
+}
+
+#lost-found-form label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.submit-btn {
+    padding: 12px;
+    background: linear-gradient(45deg, #fbbf24, #f472b6);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(45deg, #f472b6, #fbbf24);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
+}
+
+#lost-found-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.column-layout {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    position: relative;
+}
+
+.column {
+    flex: 1;
+    padding: 20px;
+}
+
+.lost-column {
+    margin-right: 20px;
+}
+
+.found-column {
+    margin-left: 20px;
+}
+
+.column h3 {
+    font-size: 1.8rem;
+    color: #fbbf24;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.vertical-line {
+    width: 2px;
+    background: #fff;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.post-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #34d399, #10b981);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.post-btn:hover {
+    background: linear-gradient(45deg, #10b981, #34d399);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(52, 211, 153, 0.4);
+}
+
+.delete-btn {
+    padding: 5px 10px;
+    background: #f472b6;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.delete-btn:hover {
+    background: #e11d48;
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(241, 114, 182, 0.4);
+}
+
+.post-form-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    width: 90%;
+}
+
+.post-form-container:hover {
+    transform: translateY(-5px);
+}
+
+.claim-btn {
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #34d399, #10b981);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.claim-btn:hover {
+    background: linear-gradient(45deg, #10b981, #34d399);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(52, 211, 153, 0.4);
+}
+
+.claim-btn:disabled {
+    cursor: not-allowed;
+}
+
+.post-card {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: #d1d5db;
+}
+
+.post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.post-card h3 {
+    font-size: 1.3rem;
+    color: #fbbf24;
+    margin-bottom: 10px;
+}
+
+.post-card p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.post-meta {
+    font-size: 0.85rem;
+    color: #a1a1aa;
+}
+
+.post-image {
+    max-width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #34d399;
+    margin: 10px 0;
+    transition: transform 0.3s ease;
+}
+
+.post-image:hover {
+    transform: scale(1.1);
+}
+
+/* Footer */
+footer {
+    background: #1e40af;
+    color: #d1d5db;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    font-size: 1rem;
+    border-top: 2px solid #fbbf24;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+    .logo-left {
+        width: 150px;
+        height: 50px;
+        top: 5px;
+        left: 5px;
+    }
+    .logo-right {
+        width: 100px;
+        height: 40px;
+        top: 5px;
+        right: 5px;
+    }
+    .title-container {
+        padding: 0 60px;
+    }
+    .header {
+        min-height: 120px;
+    }
+    .profile-container {
+        top: 100px;
+    }
+    .decorative-line {
+        margin-top: 20px;
+    }
+    .signin-section {
+        padding: 20px 10px;
+        min-height: calc(100vh - 100px);
+    }
+    .signin-wrapper {
+        padding: 15px;
+    }
+    #signin-form,
+    #register-form,
+    #forgot-password-form,
+    #change-password-form {
+        padding: 15px;
+        max-width: 100%;
+    }
+    .profile-pic {
+        width: 120px;
+        height: 120px;
+    }
+    .profile-dropdown {
+        top: 60px;
+    }
+    .dropdown-item {
+        font-size: 0.8rem;
+        padding: 8px 15px;
+    }
+    .hero h2 {
+        font-size: 1.8rem;
+    }
+    .hero {
+        padding: 15px 15px;
+        min-height: 300px;
+    }
+    .image-chain {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    .chain-image {
+        width: 100px;
+        height: 90px;
+    }
+    .feature-card {
+        min-height: 250px;
+    }
+    #lost-found h2 {
+        font-size: 2rem;
+    }
+    #lost-found-form {
+        max-width: 100%;
+        padding: 15px;
+    }
+    .post-image {
+        max-width: 100px;
+        height: 70px;
+    }
+    .post-card {
+        padding: 15px;
+    }
+}
