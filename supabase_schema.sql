@@ -160,3 +160,37 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+
+-- ============================================================
+-- MODULE 2 ADDITION: Avatar Storage Bucket
+-- Run this SEPARATELY in Supabase SQL Editor after the schema
+-- ============================================================
+
+-- Create public avatars bucket
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  ''avatars'',
+  ''avatars'',
+  true,
+  2097152,   -- 2 MB limit enforced at DB level
+  array[''image/jpeg'', ''image/png'', ''image/webp'', ''image/gif'']
+)
+on conflict (id) do nothing;
+
+-- Storage RLS: authenticated users can upload to their own folder
+create policy "Users can upload own avatar" on storage.objects
+  for insert with check (
+    bucket_id = ''avatars'' and
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "Users can update own avatar" on storage.objects
+  for update using (
+    bucket_id = ''avatars'' and
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+-- Anyone can view avatars (public bucket)
+create policy "Anyone can view avatars" on storage.objects
+  for select using (bucket_id = ''avatars'');

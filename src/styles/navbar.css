@@ -1,4 +1,4 @@
-﻿@import "./variables.css";
+@import "./variables.css";
 
 .navbar {
   background: var(--surface);
@@ -43,15 +43,7 @@
   gap: 12px;
 }
 
-.navbar-username {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* .navbar-username is now inside .navbar-avatar-btn — see profile.css */
 
 /* Compact btn size for navbar */
 .navbar .btn {
