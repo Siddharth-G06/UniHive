@@ -194,3 +194,41 @@ create policy "Users can update own avatar" on storage.objects
 -- Anyone can view avatars (public bucket)
 create policy "Anyone can view avatars" on storage.objects
   for select using (bucket_id = ''avatars'');
+
+
+-- ============================================================
+-- MODULE 3 ADDITION: Post Images Storage Bucket
+-- Run this in Supabase SQL Editor
+-- ============================================================
+
+-- Create post-images bucket
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  ''post-images'',
+  ''post-images'',
+  true,
+  5242880,   -- 5 MB
+  array[''image/jpeg'', ''image/png'', ''image/webp'', ''image/gif'']
+)
+on conflict (id) do nothing;
+
+-- Allow authenticated users to upload post images
+create policy "Users can upload post images"
+  on storage.objects for insert
+  with check (
+    bucket_id = ''post-images'' and
+    auth.role() = ''authenticated''
+  );
+
+-- Allow public read of post images
+create policy "Post images are publicly accessible"
+  on storage.objects for select
+  using (bucket_id = ''post-images'');
+
+-- Allow users to delete their own post images
+create policy "Users can delete own post images"
+  on storage.objects for delete
+  using (
+    bucket_id = ''post-images'' and
+    auth.uid()::text = (storage.foldername(name))[1]
+  );

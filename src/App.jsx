@@ -7,29 +7,41 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CompleteProfile from "./pages/CompleteProfile";
 import Profile from "./pages/Profile";
+import LostFound from "./pages/LostFound";
+import CreatePost from "./pages/CreatePost";
+import PostDetail from "./pages/PostDetail";
+import MyPosts from "./pages/MyPosts";
 import LoadingSpinner from "./components/LoadingSpinner";
 
-/** Root redirect: /dashboard if logged in, /login otherwise */
 function RootRedirect() {
   const { session, loading } = useAuth();
   if (loading) return <LoadingSpinner fullScreen />;
   return <Navigate to={session ? "/dashboard" : "/login"} replace />;
 }
 
-/** Inner app — lives inside both AuthProvider AND BrowserRouter */
 function AppRoutes() {
   return (
     <>
       <Navbar />
       <Routes>
-        {/* Root: smart redirect */}
+        {/* Root */}
         <Route path="/" element={<RootRedirect />} />
 
-        {/* Public routes */}
+        {/* Public */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected — requires auth + completed profile */}
+        {/* Onboarding — no profile_complete check */}
+        <Route
+          path="/complete-profile"
+          element={
+            <ProtectedRoute requireProfileComplete={false}>
+              <CompleteProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected — requires completed profile */}
         <Route
           path="/dashboard"
           element={
@@ -38,7 +50,6 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/profile"
           element={
@@ -47,26 +58,43 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
-        {/* My Posts — placeholder (Module 3) */}
+        <Route
+          path="/lost-found"
+          element={
+            <ProtectedRoute requireProfileComplete={true}>
+              <LostFound />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute requireProfileComplete={true}>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/posts/:id"
+          element={
+            <ProtectedRoute requireProfileComplete={true}>
+              <PostDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-post/:id"
+          element={
+            <ProtectedRoute requireProfileComplete={true}>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/my-posts"
           element={
             <ProtectedRoute requireProfileComplete={true}>
-              <div style={{ padding: "60px 24px", textAlign: "center", color: "var(--text-muted)", fontFamily: "var(--font)" }}>
-                <h2 style={{ fontSize: "1.5rem", marginBottom: "8px" }}>My Posts</h2>
-                <p>Coming in Module 3 🚀</p>
-              </div>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Complete profile — no profile_complete check to avoid redirect loop */}
-        <Route
-          path="/complete-profile"
-          element={
-            <ProtectedRoute requireProfileComplete={false}>
-              <CompleteProfile />
+              <MyPosts />
             </ProtectedRoute>
           }
         />
