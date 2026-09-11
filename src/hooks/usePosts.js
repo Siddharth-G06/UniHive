@@ -3,15 +3,9 @@ import { supabase } from "../lib/supabase";
 
 const PAGE_SIZE = 10;
 
-/**
- * Fetches posts with optional filters + realtime subscription.
- * @param {object} options
- * @param {string[]} [options.types]       - e.g. ["lost","found"]
- * @param {string}   [options.status]      - "active" | "claimed" | "resolved"
- * @param {string}   [options.category]    - exact category name or ""
- * @param {string}   [options.search]      - ilike search on title
- * @param {string}   [options.userId]      - filter to a specific user
- */
+// Correct PostgREST join syntax: table!fk_column (columns)
+const USER_SELECT = "users!user_id ( username, avatar_url, reputation_score, college )";
+
 export function usePosts({ types, status, category, search, userId } = {}) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,15 +17,7 @@ export function usePosts({ types, status, category, search, userId } = {}) {
   const buildQuery = useCallback((from = 0) => {
     let q = supabase
       .from("posts")
-      .select(`
-        *,
-        users:user_id (
-          username,
-          avatar_url,
-          reputation_score,
-          college
-        )
-      `)
+      .select(`*, ${USER_SELECT}`)
       .order("created_at", { ascending: false })
       .range(from, from + PAGE_SIZE - 1);
 
@@ -42,6 +28,7 @@ export function usePosts({ types, status, category, search, userId } = {}) {
     if (userId) q = q.eq("user_id", userId);
 
     return q;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types?.join(","), status, category, search, userId]);
 
   const fetchPosts = useCallback(async () => {
@@ -51,6 +38,7 @@ export function usePosts({ types, status, category, search, userId } = {}) {
 
     const { data, error: fetchError } = await buildQuery(0);
     if (fetchError) {
+      console.error("usePosts fetch error:", fetchError);
       setError(fetchError.message);
     } else {
       setPosts(data ?? []);
@@ -66,34 +54,32 @@ export function usePosts({ types, status, category, search, userId } = {}) {
     if (!fetchError && data) {
       setPosts((prev) => {
         const existingIds = new Set(prev.map((p) => p.id));
-        const newPosts = data.filter((p) => !existingIds.has(p.id));
-        return [...prev, ...newPosts];
+        return [...prev, ...data.filter((p) => !existingIds.has(p.id))];
       });
       setHasMore(data.length === PAGE_SIZE);
     }
   }, [buildQuery]);
 
-  // Subscribe to realtime INSERT events
+  // Realtime subscription for live INSERT events
   useEffect(() => {
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
     }
 
     const channel = supabase
-      .channel(`posts-realtime-${Math.random()}`)
+      .channel(`posts-rt-${Date.now()}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "posts" },
         async (payload) => {
           const newPost = payload.new;
-          // Only add if matches type filter
           if (types && types.length > 0 && !types.includes(newPost.type)) return;
           if (userId && newPost.user_id !== userId) return;
 
-          // Fetch full post with joined user
+          // Fetch full post with correct join syntax
           const { data } = await supabase
             .from("posts")
-            .select(`*, users:user_id (username, avatar_url, reputation_score, college)`)
+            .select(`*, ${USER_SELECT}`)
             .eq("id", newPost.id)
             .single();
 
@@ -108,15 +94,11 @@ export function usePosts({ types, status, category, search, userId } = {}) {
       .subscribe();
 
     channelRef.current = channel;
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types?.join(","), userId]);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  useEffect(() => { fetchPosts(); }, [fetchPosts]);
 
   return { posts, loading, error, hasMore, loadMore, refetch: fetchPosts };
 }
