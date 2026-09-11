@@ -1,0 +1,20 @@
+﻿:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --error: #ef4444;
+  --error-bg: #fef2f2;
+  --success: #22c55e;
+  --success-bg: #f0fdf4;
+  --radius: 8px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg: 0 8px 40px rgba(37,99,235,.12);
+  --font: "Inter", system-ui, -apple-system, sans-serif;
+}
