@@ -13,6 +13,8 @@ import CreatePost from "./pages/CreatePost";
 import PostDetail from "./pages/PostDetail";
 import ExchangeDetail from "./pages/ExchangeDetail";
 import MyPosts from "./pages/MyPosts";
+import Messages from "./pages/Messages";
+import Chat from "./pages/Chat";
 import LoadingSpinner from "./components/LoadingSpinner";
 
 function RootRedirect() {
@@ -35,15 +37,17 @@ function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/complete-profile" element={<PR noProfile><CompleteProfile /></PR>} />
 
-        <Route path="/dashboard"        element={<PR><Dashboard /></PR>} />
-        <Route path="/profile"          element={<PR><Profile /></PR>} />
-        <Route path="/lost-found"       element={<PR><LostFound /></PR>} />
-        <Route path="/exchange"         element={<PR><Exchange /></PR>} />
-        <Route path="/create-post"      element={<PR><CreatePost /></PR>} />
-        <Route path="/posts/:id"        element={<PR><PostDetail /></PR>} />
-        <Route path="/exchange/:id"     element={<PR><ExchangeDetail /></PR>} />
-        <Route path="/edit-post/:id"    element={<PR><CreatePost /></PR>} />
-        <Route path="/my-posts"         element={<PR><MyPosts /></PR>} />
+        <Route path="/dashboard"            element={<PR><Dashboard /></PR>} />
+        <Route path="/profile"              element={<PR><Profile /></PR>} />
+        <Route path="/lost-found"           element={<PR><LostFound /></PR>} />
+        <Route path="/exchange"             element={<PR><Exchange /></PR>} />
+        <Route path="/create-post"          element={<PR><CreatePost /></PR>} />
+        <Route path="/posts/:id"            element={<PR><PostDetail /></PR>} />
+        <Route path="/exchange/:id"         element={<PR><ExchangeDetail /></PR>} />
+        <Route path="/edit-post/:id"        element={<PR><CreatePost /></PR>} />
+        <Route path="/my-posts"             element={<PR><MyPosts /></PR>} />
+        <Route path="/messages"             element={<PR><Messages /></PR>} />
+        <Route path="/messages/:conversationId" element={<PR><Chat /></PR>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
