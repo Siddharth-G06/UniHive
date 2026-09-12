@@ -15,7 +15,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export const ALLOWED_DOMAINS = [
   'ssn.edu.in',
   'snu.edu.in',
-  'gmail.com'  // TESTING ONLY — DELETE THIS LINE
+  'gmail.com'  
 ]
 
 /**
