@@ -1,11 +1,28 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import {
+  MapPin,
+  Clock,
+  ArrowLeft,
+  Check,
+  X,
+  Pencil,
+  Trash2,
+  CheckCircle2,
+  Star,
+  RefreshCw,
+  Search,
+  Handshake,
+  Sparkles,
+  Calendar,
+} from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useInterests } from "../hooks/useInterests";
 import { formatTimeAgo, deletePostWithImages } from "../lib/postHelpers";
-import { POST_TYPE_CONFIG, CATEGORY_ICONS, DURATION_OPTIONS } from "../constants/categories";
-import { getReputationBadge, formatReputationScore } from "../utils/reputationHelpers";
+import { POST_TYPE_CONFIG, DURATION_OPTIONS } from "../constants/categories";
+import CategoryIcon from "../components/CategoryIcon";
+import ReputationBadge from "../components/ReputationBadge";
 import RatingModal from "../components/RatingModal";
 import StarRating from "../components/StarRating";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -30,13 +47,20 @@ function InterestItem({ interest, onAccept, onReject, accepting, rejecting }) {
   return (
     <div className="interest-item">
       <div className="interest-user">
-        {u?.avatar_url
-          ? <img src={u.avatar_url} alt={u.username} className="interest-avatar" />
-          : <span className="interest-avatar interest-avatar-initials">{(u?.username ?? "U")[0].toUpperCase()}</span>
-        }
+        {u?.avatar_url ? (
+          <img src={u.avatar_url} alt={u.username} className="interest-avatar" />
+        ) : (
+          <span className="interest-avatar interest-avatar-initials">
+            {(u?.username ?? "U")[0].toUpperCase()}
+          </span>
+        )}
         <div>
           <p className="interest-username">@{u?.username ?? "—"}</p>
-          {u?.college && <span className={`college-badge badge-${u.college.toLowerCase()}`} style={{ fontSize: "0.65rem", padding: "2px 8px" }}>{u.college}</span>}
+          {u?.college && (
+            <span className={`college-badge badge-${u.college.toLowerCase()}`} style={{ fontSize: "0.65rem", padding: "2px 8px" }}>
+              {u.college}
+            </span>
+          )}
         </div>
       </div>
 
@@ -45,7 +69,7 @@ function InterestItem({ interest, onAccept, onReject, accepting, rejecting }) {
       )}
 
       <div className="interest-footer">
-        <span style={{ fontSize: "0.75rem", color: statusColor, fontWeight: 600 }}>
+        <span style={{ fontSize: "0.75rem", color: statusColor, fontWeight: 700 }}>
           {interest.status.charAt(0).toUpperCase() + interest.status.slice(1)}
         </span>
         {interest.status === "pending" && (
@@ -55,14 +79,16 @@ function InterestItem({ interest, onAccept, onReject, accepting, rejecting }) {
               onClick={() => onAccept(interest.id, interest.from_user_id)}
               disabled={accepting}
             >
-              {accepting ? "..." : "✓ Accept"}
+              <Check size={14} />
+              {accepting ? "..." : "Accept"}
             </button>
             <button
               className="btn-interest-reject"
               onClick={() => onReject(interest.id)}
               disabled={rejecting}
             >
-              {rejecting ? "..." : "✗ Reject"}
+              <X size={14} />
+              {rejecting ? "..." : "Reject"}
             </button>
           </div>
         )}
@@ -104,7 +130,10 @@ export default function ExchangeDetail() {
   const [acceptingId, setAcceptingId] = useState(null);
   const [rejectingId, setRejectingId] = useState(null);
 
-  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3500); }
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3500);
+  }
 
   useEffect(() => {
     async function load() {
@@ -142,24 +171,29 @@ export default function ExchangeDetail() {
   }, [id, user]);
 
   if (loading) return <LoadingSpinner fullScreen />;
-  if (!post) return (
-    <div style={{ padding: "80px 24px", textAlign: "center" }}>
-      <p style={{ fontSize: "3rem" }}>🔍</p>
-      <p style={{ fontWeight: 700 }}>Post not found</p>
-      <button className="btn btn-outline" style={{ marginTop: 16 }} onClick={() => navigate("/exchange")}>
-        ← Back to Exchange
-      </button>
-    </div>
-  );
+  if (!post) {
+    return (
+      <div style={{ padding: "80px 24px", textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+          <Search size={48} color="var(--text-muted)" />
+        </div>
+        <p style={{ fontWeight: 800, fontSize: "1.2rem" }}>Exchange post not found</p>
+        <button className="btn btn-outline" style={{ marginTop: 16 }} onClick={() => navigate("/exchange")}>
+          <ArrowLeft size={16} /> Back to Exchange
+        </button>
+      </div>
+    );
+  }
 
   const typeCfg = POST_TYPE_CONFIG[post.type] ?? POST_TYPE_CONFIG.offer;
-  const icon = CATEGORY_ICONS[post.category] ?? "📦";
   const poster = post.users;
   const images = post.images || [];
-  const badge = getReputationBadge(poster?.reputation_score, poster?.rating_count);
-  const scoreDisplay = formatReputationScore(poster?.reputation_score, poster?.rating_count);
 
   async function handleSendInterest() {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
     setSendingInterest(true);
     const { data, error } = await supabase
       .from("interests")
@@ -209,15 +243,18 @@ export default function ExchangeDetail() {
       const otherUser = conv.user_a_id === user.id ? conv.user_b : conv.user_a;
       setRatingModal({ ratedUserId: otherUser.id, ratedUsername: otherUser.username });
     } else {
-      showToast("Marked as resolved ✅");
+      showToast("Marked as resolved");
     }
   }
 
   async function handleDelete() {
     setDeleting(true);
     const { error } = await deletePostWithImages(post.id, user.id, images);
-    if (!error) navigate("/exchange");
-    else setDeleting(false);
+    if (!error) {
+      navigate("/exchange");
+    } else {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -227,11 +264,16 @@ export default function ExchangeDetail() {
         {/* ── Left: Gallery + Info ── */}
         <div>
           <div className="gallery-main">
-            {images.length > 0
-              ? <img src={images[activeImg]} alt={post.title} />
-              : <span className="gallery-main-placeholder">{icon}</span>
-            }
+            {images.length > 0 ? (
+              <img src={images[activeImg]} alt={post.title} />
+            ) : (
+              <div className="gallery-main-placeholder">
+                <CategoryIcon category={post.category} size={64} />
+                <span style={{ fontSize: "0.9rem", fontWeight: 700 }}>{post.category || "Item"}</span>
+              </div>
+            )}
           </div>
+
           {images.length > 1 && (
             <div className="gallery-strip">
               {images.map((url, i) => (
@@ -239,7 +281,8 @@ export default function ExchangeDetail() {
                   key={i}
                   className={`gallery-thumb ${i === activeImg ? "active" : ""}`}
                   onClick={() => setActiveImg(i)}
-                  role="button" tabIndex={0}
+                  role="button"
+                  tabIndex={0}
                   onKeyDown={(e) => e.key === "Enter" && setActiveImg(i)}
                 >
                   <img src={url} alt={`Thumb ${i + 1}`} />
@@ -256,11 +299,18 @@ export default function ExchangeDetail() {
               >
                 {typeCfg.label}
               </span>
-              <span className="detail-badge" style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--text-muted)", position: "static" }}>
-                {icon} {post.category}
+              <span
+                className="detail-badge"
+                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--text-muted)", position: "static" }}
+              >
+                <CategoryIcon category={post.category} size={14} style={{ marginRight: 4 }} />
+                {post.category}
               </span>
               {post.duration_days && (
-                <span className="duration-badge">{durationLabel(post.duration_days)}</span>
+                <span className="duration-badge" style={{ position: "static" }}>
+                  <Clock size={12} style={{ marginRight: 3 }} />
+                  {durationLabel(post.duration_days)}
+                </span>
               )}
             </div>
 
@@ -277,11 +327,17 @@ export default function ExchangeDetail() {
             )}
 
             {post.location && (
-              <p className="post-detail-location"><span>📍</span> {post.location}</p>
+              <p className="post-detail-location">
+                <MapPin size={16} color="var(--primary)" />
+                <span>{post.location}</span>
+              </p>
             )}
-            <p className="post-detail-time">
-              Posted {formatTimeAgo(post.created_at)} &nbsp;·&nbsp;{" "}
-              {new Date(post.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+
+            <p className="post-detail-time" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Calendar size={14} />
+              <span>Posted {formatTimeAgo(post.created_at)}</span>
+              <span>&middot;</span>
+              <span>{new Date(post.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</span>
             </p>
           </div>
         </div>
@@ -293,11 +349,12 @@ export default function ExchangeDetail() {
           <div className="trust-section">
             <p className="poster-label">Posted by</p>
             <Link to={`/users/${poster?.username}`} style={{ textDecoration: "none" }}>
-              <div className="poster-info">
-                {poster?.avatar_url
-                  ? <img src={poster.avatar_url} alt={poster.username} className="poster-avatar" />
-                  : <span className="poster-avatar-initials">{(poster?.username ?? "U")[0].toUpperCase()}</span>
-                }
+              <div className="poster-info" style={{ marginTop: 10 }}>
+                {poster?.avatar_url ? (
+                  <img src={poster.avatar_url} alt={poster.username} className="poster-avatar" />
+                ) : (
+                  <span className="poster-avatar-initials">{(poster?.username ?? "U")[0].toUpperCase()}</span>
+                )}
                 <div>
                   <p className="poster-username">@{poster?.username ?? "—"}</p>
                   {poster?.college && (
@@ -308,23 +365,29 @@ export default function ExchangeDetail() {
                 </div>
               </div>
             </Link>
-            <div className="trust-stats">
+
+            <div className="trust-stats" style={{ marginTop: 14 }}>
               <div className="trust-stat">
-                <span className="trust-stat-icon">⭐</span>
-                <span className="trust-stat-value">{scoreDisplay !== "New" ? scoreDisplay : "—"}</span>
-                <span className="trust-stat-label">Score</span>
+                <span className="trust-stat-icon" style={{ color: "#f59e0b" }}>
+                  <Star size={18} fill="#f59e0b" />
+                </span>
+                <span className="trust-stat-value">
+                  {poster?.reputation_score ? Number(poster.reputation_score).toFixed(1) : "—"}
+                </span>
+                <span className="trust-stat-label">Rating</span>
               </div>
               <div className="trust-stat">
-                <span className="trust-stat-icon">🔄</span>
+                <span className="trust-stat-icon" style={{ color: "var(--primary)" }}>
+                  <RefreshCw size={18} />
+                </span>
                 <span className="trust-stat-value">{ownerExchangeCount}</span>
                 <span className="trust-stat-label">Exchanges</span>
               </div>
             </div>
-            <div style={{ marginTop: 8 }}>
+
+            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <StarRating value={Math.round(poster?.reputation_score ?? 0)} readonly size="sm" />
-              <span className="rep-badge" style={{ background: badge.bg, color: badge.color, marginLeft: 6 }}>
-                {badge.icon} {badge.label}
-              </span>
+              <ReputationBadge score={poster?.reputation_score} ratingCount={poster?.rating_count} size="sm" />
             </div>
           </div>
 
@@ -342,6 +405,7 @@ export default function ExchangeDetail() {
                       style={{ background: typeCfg.ctaColor, borderColor: typeCfg.ctaColor }}
                       onClick={() => setShowNoteBox(true)}
                     >
+                      <Handshake size={18} />
                       {typeCfg.cta}
                     </button>
                   </>
@@ -370,7 +434,8 @@ export default function ExchangeDetail() {
                         onClick={handleSendInterest}
                         disabled={sendingInterest}
                       >
-                        {sendingInterest ? "Sending..." : "Send Interest ✓"}
+                        <Check size={16} />
+                        {sendingInterest ? "Sending..." : "Send Interest"}
                       </button>
                     </div>
                   </div>
@@ -379,25 +444,25 @@ export default function ExchangeDetail() {
                 {myInterest && (
                   <div className="interest-status-box">
                     {myInterest.status === "pending" && (
-                      <p className="interest-status-msg interest-pending">
-                        ⏳ You&apos;ve expressed interest — waiting for response
+                      <p className="interest-status-msg interest-pending" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <Clock size={16} /> You have expressed interest &mdash; waiting for response
                       </p>
                     )}
                     {myInterest.status === "accepted" && (
-                      <p className="interest-status-msg interest-accepted">
-                        🎉 Your interest was accepted! Check your messages.
+                      <p className="interest-status-msg interest-accepted" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <Sparkles size={16} /> Your interest was accepted! Check your messages.
                       </p>
                     )}
                     {myInterest.status === "rejected" && (
-                      <p className="interest-status-msg interest-rejected">
-                        This time it didn&apos;t work out. Try another post!
+                      <p className="interest-status-msg interest-rejected" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <X size={16} /> This exchange was not matched. Try another post!
                       </p>
                     )}
                   </div>
                 )}
 
                 {interestMsg && (
-                  <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", textAlign: "center", marginTop: 8 }}>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", textAlign: "center", marginTop: 8 }}>
                     {interestMsg}
                   </p>
                 )}
@@ -416,9 +481,9 @@ export default function ExchangeDetail() {
                   )}
                 </p>
                 {interestsLoading ? (
-                  <p style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>Loading...</p>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Loading...</p>
                 ) : interests.length === 0 ? (
-                  <p style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>No one has expressed interest yet.</p>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>No one has expressed interest yet.</p>
                 ) : (
                   <div className="interest-list">
                     {interests.map((interest) => (
@@ -436,24 +501,43 @@ export default function ExchangeDetail() {
 
                 {/* Owner manage actions */}
                 <div className="manage-actions" style={{ marginTop: 16 }}>
-                  <button className="btn-manage" onClick={() => navigate(`/edit-post/${post.id}`)}>✏️ Edit Post</button>
-                  <button className="btn-manage btn-manage-success" onClick={handleResolve} disabled={resolving}>
-                    {resolving ? "Updating..." : "✅ Mark as Resolved"}
+                  <button className="btn-manage" onClick={() => navigate(`/edit-post/${post.id}`)}>
+                    <Pencil size={15} /> Edit Post
                   </button>
-                  <button className="btn-manage btn-manage-danger" onClick={() => setDeleteModal(true)}>🗑️ Delete Post</button>
+                  <button className="btn-manage btn-manage-success" onClick={handleResolve} disabled={resolving}>
+                    <CheckCircle2 size={15} />
+                    {resolving ? "Updating..." : "Mark as Resolved"}
+                  </button>
+                  <button className="btn-manage btn-manage-danger" onClick={() => setDeleteModal(true)}>
+                    <Trash2 size={15} /> Delete Post
+                  </button>
                 </div>
               </>
             )}
 
             {post.status === "claimed" && (
-              <div className="status-info-box status-info-claimed">🤝 Exchange in progress</div>
+              <div className="status-info-box status-info-claimed">
+                <Handshake size={18} /> Exchange in progress
+                {isOwner && (
+                  <button
+                    className="btn-manage btn-manage-success"
+                    style={{ marginTop: 10, width: "100%" }}
+                    onClick={handleResolve}
+                    disabled={resolving}
+                  >
+                    <CheckCircle2 size={15} /> Mark as Resolved
+                  </button>
+                )}
+              </div>
             )}
             {post.status === "resolved" && (
-              <div className="status-info-box status-info-resolved">✅ Exchange completed!</div>
+              <div className="status-info-box status-info-resolved">
+                <CheckCircle2 size={18} /> Exchange completed!
+              </div>
             )}
 
-            <button className="btn-manage" style={{ fontSize: "0.82rem" }} onClick={() => navigate("/exchange")}>
-              ← Back to Exchange
+            <button className="btn-manage" style={{ fontSize: "0.85rem", marginTop: 12 }} onClick={() => navigate("/exchange")}>
+              <ArrowLeft size={15} /> Back to Exchange
             </button>
           </div>
         </aside>
@@ -461,19 +545,40 @@ export default function ExchangeDetail() {
 
       {toast && <div className="toast toast-success" role="status">{toast}</div>}
 
+      {ratingModal && (
+        <RatingModal
+          isOpen
+          postId={post.id}
+          postTitle={post.title}
+          ratedUserId={ratingModal.ratedUserId}
+          ratedUsername={ratingModal.ratedUsername}
+          onClose={() => {
+            setRatingModal(null);
+            showToast("Exchange resolved!");
+          }}
+          onSubmitted={() => {
+            setRatingModal(null);
+            showToast("Rating submitted!");
+          }}
+        />
+      )}
+
       {deleteModal && (
         <div className="modal-overlay" onClick={() => setDeleteModal(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">Delete this post?</h2>
             <p className="modal-desc">&ldquo;{post.title}&rdquo; will be permanently deleted.</p>
             <div className="modal-actions">
-              <button className="btn btn-outline" onClick={() => setDeleteModal(false)} disabled={deleting}>Cancel</button>
+              <button className="btn btn-outline" onClick={() => setDeleteModal(false)} disabled={deleting}>
+                Cancel
+              </button>
               <button
                 className="btn btn-primary"
                 style={{ background: "var(--error)", borderColor: "var(--error)" }}
                 onClick={handleDelete}
                 disabled={deleting}
               >
+                <Trash2 size={16} />
                 {deleting ? "Deleting..." : "Yes, Delete"}
               </button>
             </div>
@@ -483,5 +588,3 @@ export default function ExchangeDetail() {
     </main>
   );
 }
-
-

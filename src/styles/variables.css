@@ -1,20 +1,128 @@
-﻿:root {
+:root {
+  /* ============================================================
+     LIGHT MODE TOKENS (Default)
+     ============================================================ */
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --primary-light: #eff6ff;
+  --primary-glow: rgba(37, 99, 235, 0.2);
   --background: #f8fafc;
   --surface: #ffffff;
+  --surface-alt: #f1f5f9;
+  --surface-hover: #f8fafc;
   --border: #e2e8f0;
-  --text: #1e293b;
+  --border-subtle: #cbd5e1;
+  --text: #0f172a;
   --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
+  /* Statuses */
   --error: #ef4444;
   --error-bg: #fef2f2;
-  --success: #22c55e;
+  --error-border: #fecaca;
+  --error-text: #dc2626;
+
+  --success: #16a34a;
   --success-bg: #f0fdf4;
-  --radius: 8px;
+  --success-border: #bbf7d0;
+  --success-text: #15803d;
+
+  --warning: #f59e0b;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+
+  --info: #3b82f6;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1d4ed8;
+
+  --purple: #8b5cf6;
+  --purple-bg: #f5f3ff;
+  --purple-border: #ddd6fe;
+  --purple-text: #6d28d9;
+
+  --radius-sm: 6px;
+  --radius: 10px;
   --radius-lg: 16px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
-  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
-  --shadow-lg: 0 8px 40px rgba(37,99,235,.12);
+  --radius-xl: 24px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.04);
+
   --font: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Component specifics */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-hover-border: #cbd5e1;
+  --input-bg: #ffffff;
+  --input-border: #e2e8f0;
+  --dropdown-bg: #ffffff;
+  --chat-sent-bg: #2563eb;
+  --chat-sent-text: #ffffff;
+  --chat-received-bg: #f1f5f9;
+  --chat-received-text: #0f172a;
+}
+
+[data-theme="dark"], html.dark {
+  /* ============================================================
+     DARK MODE TOKENS — Sleek Deep Slate & Vibrant Neon Glows
+     ============================================================ */
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-light: rgba(59, 130, 246, 0.16);
+  --primary-glow: rgba(59, 130, 246, 0.35);
+  --background: #0b0f19;
+  --surface: #131b2e;
+  --surface-alt: #1a253c;
+  --surface-hover: #1e2c47;
+  --border: #23304b;
+  --border-subtle: #334155;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+
+  /* Statuses in Dark Mode (softened, vibrant glow backgrounds) */
+  --error: #f87171;
+  --error-bg: rgba(239, 68, 68, 0.16);
+  --error-border: rgba(239, 68, 68, 0.32);
+  --error-text: #fca5a5;
+
+  --success: #4ade80;
+  --success-bg: rgba(34, 197, 94, 0.16);
+  --success-border: rgba(34, 197, 94, 0.32);
+  --success-text: #86efac;
+
+  --warning: #fbbf24;
+  --warning-bg: rgba(245, 158, 11, 0.16);
+  --warning-border: rgba(245, 158, 11, 0.32);
+  --warning-text: #fde68a;
+
+  --info: #60a5fa;
+  --info-bg: rgba(59, 130, 246, 0.16);
+  --info-border: rgba(59, 130, 246, 0.32);
+  --info-text: #93c5fd;
+
+  --purple: #a78bfa;
+  --purple-bg: rgba(167, 139, 250, 0.16);
+  --purple-border: rgba(167, 139, 250, 0.32);
+  --purple-text: #c4b5fd;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 10px 35px rgba(0, 0, 0, 0.75);
+
+  /* Component specifics */
+  --card-bg: #131b2e;
+  --card-border: #23304b;
+  --card-hover-border: #3b82f6;
+  --input-bg: #0f172a;
+  --input-border: #23304b;
+  --dropdown-bg: #131b2e;
+  --chat-sent-bg: #2563eb;
+  --chat-sent-text: #ffffff;
+  --chat-received-bg: #1e2c47;
+  --chat-received-text: #f8fafc;
 }

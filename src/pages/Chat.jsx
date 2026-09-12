@@ -1,5 +1,6 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Send, CheckCircle2, MessageSquare } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useMessages } from "../hooks/useMessages";
@@ -7,6 +8,7 @@ import { useConversations } from "../hooks/useConversations";
 import MessageBubble from "../components/MessageBubble";
 import ConversationItem from "../components/ConversationItem";
 import LoadingSpinner from "../components/LoadingSpinner";
+import MessageSkeleton from "../components/MessageSkeleton";
 import "../styles/chat.css";
 
 const POST_ROUTE = { lost: "/posts", found: "/posts", request: "/exchange", offer: "/exchange" };
@@ -132,8 +134,8 @@ export default function Chat() {
       {/* ── Sidebar (conversations) ── */}
       <aside className="conv-sidebar conv-sidebar-narrow">
         <div className="conv-sidebar-header">
-          <h2 className="conv-sidebar-title" style={{ fontSize: "1rem" }}>
-            Messages
+          <h2 className="conv-sidebar-title" style={{ fontSize: "1rem", display: "flex", alignItems: "center", gap: 6 }}>
+            <MessageSquare size={16} /> Messages
             {totalUnread > 0 && <span className="conv-total-unread">{totalUnread}</span>}
           </h2>
         </div>
@@ -159,9 +161,7 @@ export default function Chat() {
             onClick={() => navigate("/messages")}
             aria-label="Back to messages"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ArrowLeft size={20} />
           </button>
 
           {convLoading ? (
@@ -170,12 +170,13 @@ export default function Chat() {
             </div>
           ) : (
             <div className="chat-header-user">
-              {otherUser?.avatar_url
-                ? <img src={otherUser.avatar_url} alt={otherUser.username} className="chat-header-avatar" />
-                : <span className="chat-header-avatar chat-header-avatar-initials">
-                    {(otherUser?.username ?? "U")[0].toUpperCase()}
-                  </span>
-              }
+              {otherUser?.avatar_url ? (
+                <img src={otherUser.avatar_url} alt={otherUser.username} className="chat-header-avatar" />
+              ) : (
+                <span className="chat-header-avatar chat-header-avatar-initials">
+                  {(otherUser?.username ?? "U")[0].toUpperCase()}
+                </span>
+              )}
               <div>
                 <p className="chat-header-name">@{otherUser?.username ?? "—"}</p>
                 {post && (
@@ -184,7 +185,11 @@ export default function Chat() {
                     onClick={() => navigate(`${POST_ROUTE[post.type] ?? "/posts"}/${post.id}`)}
                   >
                     Re: {post.title}
-                    {post.status === "resolved" && <span className="chat-resolved-badge">✅ Resolved</span>}
+                    {post.status === "resolved" && (
+                      <span className="chat-resolved-badge" style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                        <CheckCircle2 size={11} /> Resolved
+                      </span>
+                    )}
                   </button>
                 )}
               </div>
@@ -194,11 +199,11 @@ export default function Chat() {
 
         {/* Messages area */}
         <div className="chat-messages" id="chat-messages-area">
-          {msgsLoading && <LoadingSpinner />}
+          {msgsLoading && <MessageSkeleton />}
 
           {!msgsLoading && messages.length === 0 && (
             <div className="chat-no-messages">
-              <p>No messages yet. Say hi! 👋</p>
+              <p>No messages yet. Send a message to get started!</p>
             </div>
           )}
 
@@ -251,9 +256,7 @@ export default function Chat() {
               disabled={!input.trim() || overLimit || sending}
               aria-label="Send message"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Send size={18} />
             </button>
           </div>
         </div>

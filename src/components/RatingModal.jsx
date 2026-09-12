@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+import { useState } from "react";
+import { Star, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { addSkipped } from "../hooks/usePendingRatings";
@@ -9,8 +10,13 @@ import "../styles/ratings.css";
  * Modal for submitting a rating after a resolved exchange.
  */
 export default function RatingModal({
-  isOpen, postId, ratedUserId, ratedUsername, postTitle,
-  onClose, onSubmitted,
+  isOpen,
+  postId,
+  ratedUserId,
+  ratedUsername,
+  postTitle,
+  onClose,
+  onSubmitted,
 }) {
   const { user } = useAuth();
   const [score, setScore] = useState(0);
@@ -38,7 +44,7 @@ export default function RatingModal({
       .maybeSingle();
 
     if (existing) {
-      setError("You''ve already rated this interaction.");
+      setError("You have already rated this interaction.");
       setSubmitting(false);
       return;
     }
@@ -54,7 +60,7 @@ export default function RatingModal({
     setSubmitting(false);
     if (insertErr) {
       if (insertErr.code === "23505") {
-        setError("You''ve already rated this interaction.");
+        setError("You have already rated this interaction.");
       } else {
         setError(insertErr.message);
       }
@@ -71,6 +77,15 @@ export default function RatingModal({
   return (
     <div className="rating-overlay" role="dialog" aria-modal="true" aria-label="Rate your experience">
       <div className="rating-card">
+        <button
+          className="modal-close-btn"
+          style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", cursor: "pointer", color: "var(--text-muted)" }}
+          onClick={handleSkip}
+          aria-label="Close"
+        >
+          <X size={20} />
+        </button>
+
         <div className="rating-card-header">
           <h2 className="rating-title">Rate your experience</h2>
           <p className="rating-subtitle">with <strong>@{ratedUsername}</strong></p>
@@ -82,19 +97,18 @@ export default function RatingModal({
         <form onSubmit={handleSubmit}>
           <div className="rating-stars-row">
             <StarRating value={score} onChange={setScore} size="lg" />
-            {score === 0 && <p className="rating-stars-hint">Tap to rate</p>}
+            {score === 0 && <p className="rating-stars-hint">Select a star rating</p>}
           </div>
 
-          <div className="form-group" style={{ marginTop: 16 }}>
+          <div className="form-group" style={{ marginTop: 20 }}>
             <label htmlFor="rating-comment" className="form-label" style={{ fontSize: "0.85rem" }}>
-              Share your experience
-              <span className="optional-label"> (optional)</span>
+              Share your feedback <span className="optional-label">(optional)</span>
             </label>
             <textarea
               id="rating-comment"
               className="form-input"
               style={{ minHeight: 80, resize: "vertical", fontFamily: "var(--font)" }}
-              placeholder="How was the interaction? Was the item as described?"
+              placeholder="How was the exchange? Was the item in good condition and returned on time?"
               value={comment}
               onChange={(e) => setComment(e.target.value.slice(0, 300))}
             />
@@ -110,9 +124,10 @@ export default function RatingModal({
             type="submit"
             className="btn btn-primary btn-full"
             disabled={!canSubmit}
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 8, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}
           >
-            {submitting ? "Submitting..." : "Submit Rating ★"}
+            <Star size={16} fill={canSubmit ? "#ffffff" : "none"} />
+            {submitting ? "Submitting..." : "Submit Rating"}
           </button>
         </form>
 

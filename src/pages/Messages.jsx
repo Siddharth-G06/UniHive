@@ -1,5 +1,6 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { MessageSquare, MessageCircle, Star } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useConversations } from "../hooks/useConversations";
 import { usePendingRatings } from "../hooks/usePendingRatings";
@@ -17,7 +18,10 @@ export default function Messages() {
   const [ratingModal, setRatingModal] = useState(null);
   const [toast, setToast] = useState("");
 
-  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3500); }
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3500);
+  }
 
   return (
     <main className="messages-page" id="messages-page">
@@ -25,8 +29,9 @@ export default function Messages() {
         {/* Sidebar — conversation list */}
         <aside className="conv-sidebar">
           <div className="conv-sidebar-header">
-            <h1 className="conv-sidebar-title">
-              Messages
+            <h1 className="conv-sidebar-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <MessageSquare size={20} />
+              <span>Messages</span>
               {totalUnread > 0 && <span className="conv-total-unread">{totalUnread}</span>}
             </h1>
           </div>
@@ -34,8 +39,9 @@ export default function Messages() {
           {/* Pending ratings banner */}
           {pendingRatings.length > 0 && (
             <div className="pending-rating-banner" style={{ margin: "10px 12px 0", borderRadius: "8px" }}>
-              <p className="pending-banner-title">
-                ⭐ {pendingRatings.length} pending rating{pendingRatings.length > 1 ? "s" : ""}
+              <p className="pending-banner-title" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Star size={14} fill="#f59e0b" color="#f59e0b" />
+                <span>{pendingRatings.length} pending rating{pendingRatings.length > 1 ? "s" : ""}</span>
               </p>
               {pendingRatings.map((pr) => (
                 <div key={pr.conversationId} className="pending-item">
@@ -46,11 +52,13 @@ export default function Messages() {
                   <button
                     className="btn-rate-now"
                     onClick={() => setRatingModal({
-                      postId: pr.post.id, postTitle: pr.post.title,
-                      ratedUserId: pr.otherUser.id, ratedUsername: pr.otherUser.username,
+                      postId: pr.post.id,
+                      postTitle: pr.post.title,
+                      ratedUserId: pr.otherUser.id,
+                      ratedUsername: pr.otherUser.username,
                     })}
                   >
-                    Rate ★
+                    <Star size={12} fill="currentColor" /> Rate
                   </button>
                 </div>
               ))}
@@ -60,15 +68,17 @@ export default function Messages() {
           <div className="conv-list" role="list">
             {loading && (
               <div className="conv-skeletons">
-                {[1,2,3].map((i) => <div key={i} className="conv-skeleton" />)}
+                {[1, 2, 3].map((i) => <div key={i} className="conv-skeleton" />)}
               </div>
             )}
 
             {!loading && conversations.length === 0 && pendingRatings.length === 0 && (
               <div className="conv-empty">
-                <span className="conv-empty-icon">💬</span>
+                <div className="conv-empty-icon" style={{ display: "flex", justifyContent: "center" }}>
+                  <MessageCircle size={40} color="var(--text-muted)" />
+                </div>
                 <p className="conv-empty-title">No conversations yet</p>
-                <p className="conv-empty-desc">Express interest in a post to start chatting!</p>
+                <p className="conv-empty-desc">Express interest in a post to start chatting with campus peers!</p>
               </div>
             )}
 
@@ -86,9 +96,11 @@ export default function Messages() {
 
         {/* Right panel — empty state when no chat selected */}
         <div className="chat-panel-empty">
-          <span className="chat-panel-empty-icon">💬</span>
+          <div className="chat-panel-empty-icon" style={{ display: "flex", justifyContent: "center" }}>
+            <MessageSquare size={48} color="var(--text-muted)" />
+          </div>
           <p className="chat-panel-empty-title">Select a conversation</p>
-          <p className="chat-panel-empty-desc">Choose a conversation from the list to start messaging</p>
+          <p className="chat-panel-empty-desc">Choose a conversation from the sidebar to view messages</p>
         </div>
       </div>
 
@@ -104,7 +116,7 @@ export default function Messages() {
           onClose={() => setRatingModal(null)}
           onSubmitted={() => {
             setRatingModal(null);
-            showToast("Rating submitted! ⭐");
+            showToast("Rating submitted successfully!");
             refetchPending();
           }}
         />

@@ -1,13 +1,13 @@
-﻿@import "./variables.css";
+@import "./variables.css";
 
 /* =========================================
    SHARED PROFILE PAGE LAYOUT
    ========================================= */
 .profile-page {
   flex: 1;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 64px);
   background: var(--background);
-  padding: 40px 24px;
+  padding: 44px 28px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -20,9 +20,9 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 40px 36px;
+  padding: 44px 40px;
   width: 100%;
-  max-width: 480px;
+  max-width: 560px;
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1) both;
 }
@@ -35,25 +35,25 @@
 .profile-card-header { text-align: center; margin-bottom: 32px; }
 
 .profile-title {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.5px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .profile-subtitle {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 /* Progress bar */
-.profile-progress { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.profile-progress { display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .progress-bar {
-  width: 200px;
-  height: 6px;
-  background: var(--border);
+  width: 240px;
+  height: 7px;
+  background: var(--surface-alt);
   border-radius: 100px;
   overflow: hidden;
 }
@@ -63,7 +63,7 @@
   border-radius: 100px;
   transition: width 0.5s ease;
 }
-.progress-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+.progress-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
 
 /* =========================================
    AVATAR UPLOAD
@@ -72,19 +72,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 28px;
 }
 
 .avatar-upload-btn {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 104px;
+  height: 104px;
   border-radius: 50%;
   border: 3px solid var(--border);
   overflow: hidden;
   cursor: pointer;
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  background: var(--surface-alt);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,7 +102,7 @@
 }
 
 .avatar-initials {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   font-weight: 800;
   color: var(--primary);
   user-select: none;
@@ -111,7 +111,7 @@
 .avatar-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,.5);
+  background: rgba(0,0,0,.55);
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -122,13 +122,13 @@
   transition: opacity 0.2s;
   font-size: 0.72rem;
   color: white;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .avatar-file-input { display: none; }
 
 .avatar-file-info {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   text-align: center;
 }
@@ -141,10 +141,10 @@
 /* Smaller avatar for edit section */
 .avatar-section-sm .avatar-upload-btn,
 .avatar-upload-sm {
-  width: 72px !important;
-  height: 72px !important;
+  width: 80px !important;
+  height: 80px !important;
 }
-.avatar-section-sm .avatar-initials { font-size: 1.8rem !important; }
+.avatar-section-sm .avatar-initials { font-size: 2rem !important; }
 
 /* =========================================
    FORM INPUT STATES
@@ -159,13 +159,13 @@
 .username-status {
   position: absolute;
   right: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   white-space: nowrap;
 }
 .status-available { color: var(--success); }
 .status-taken { color: var(--error); }
-.status-checking { opacity: 0.6; }
+.status-checking { opacity: 0.7; color: var(--text-muted); }
 
 .input-valid { border-color: var(--success) !important; }
 .input-invalid { border-color: var(--error) !important; }
@@ -191,8 +191,8 @@
 /* Inline spinner inside button */
 .btn-spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border: 2px solid rgba(255,255,255,.4);
   border-top-color: white;
   border-radius: 50%;
@@ -207,12 +207,12 @@
 .profile-view-page { align-items: flex-start; }
 .profile-view-grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 24px;
+  grid-template-columns: 320px 1fr;
+  gap: 28px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1140px;
 }
-@media (max-width: 700px) {
+@media (max-width: 840px) {
   .profile-view-grid { grid-template-columns: 1fr; }
 }
 
@@ -221,41 +221,41 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 28px 24px;
+  padding: 32px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   box-shadow: var(--shadow-sm);
   height: fit-content;
 }
 
 .profile-avatar-lg {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  background: var(--surface-alt);
 }
 .avatar-img-lg { width: 100%; height: 100%; object-fit: cover; }
 .avatar-initials-lg {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: var(--primary);
 }
 
 .profile-info-name {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--text);
   text-align: center;
 }
 .profile-info-email {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   word-break: break-all;
   text-align: center;
@@ -272,14 +272,14 @@
   text-align: center;
 }
 .badge-ssn {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  background: var(--info-bg);
+  color: var(--info-text);
+  border: 1px solid var(--info-border);
 }
 .badge-snuc {
-  background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
 }
 
 /* Stats */
@@ -301,169 +301,28 @@
 
 .profile-member-since {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding-top: 8px;
+  gap: 6px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
   width: 100%;
+  justify-content: center;
+  font-size: 0.82rem;
 }
 .info-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-.info-value { font-size: 0.88rem; color: var(--text); font-weight: 500; }
+.info-value { font-size: 0.88rem; color: var(--text); font-weight: 600; }
 
 /* Right edit card */
 .profile-edit-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 28px 32px;
+  padding: 32px 36px;
   box-shadow: var(--shadow-sm);
 }
 .profile-edit-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 24px;
-}
-
-/* =========================================
-   TOAST NOTIFICATION
-   ========================================= */
-.toast {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  padding: 12px 20px;
-  border-radius: var(--radius);
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 9000;
-  box-shadow: var(--shadow-md);
-  animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
-}
-@keyframes toastIn {
-  from { opacity: 0; transform: translateY(16px) scale(0.95); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.toast-success {
-  background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
-}
-
-/* =========================================
-   NAVBAR DROPDOWN (new styles)
-   ========================================= */
-.navbar-user-menu {
-  position: relative;
-}
-
-.navbar-avatar-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  border: 1.5px solid var(--border);
-  border-radius: 100px;
-  padding: 4px 12px 4px 4px;
-  cursor: pointer;
-  font-family: var(--font);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
-  transition: background 0.15s, border-color 0.15s;
-}
-.navbar-avatar-btn:hover { background: var(--background); border-color: #cbd5e1; }
-
-.navbar-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.navbar-avatar-initials {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), #3b82f6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: white;
-}
-
-.navbar-username {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.navbar-caret {
-  color: var(--text-muted);
-  transition: transform 0.2s;
-  flex-shrink: 0;
-}
-.navbar-caret.open { transform: rotate(180deg); }
-
-.navbar-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 200px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
-  z-index: 200;
-  overflow: hidden;
-  animation: dropIn 0.18s ease both;
-}
-@keyframes dropIn {
-  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
   color: var(--text);
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-  font-family: var(--font);
-  transition: background 0.12s;
-}
-.dropdown-item:hover { background: var(--background); }
-.dropdown-icon { font-size: 1rem; width: 20px; text-align: center; }
-.dropdown-item-danger { color: var(--error); }
-.dropdown-item-danger:hover { background: var(--error-bg); }
-
-.dropdown-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 4px 0;
-}
-
-.dropdown-badge {
-  margin-left: auto;
-  font-size: 0.65rem;
-  font-weight: 700;
-  background: #fef3c7;
-  color: #92400e;
-  padding: 2px 7px;
-  border-radius: 100px;
-  border: 1px solid #fde68a;
-  letter-spacing: 0.3px;
+  margin-bottom: 28px;
 }

@@ -1,5 +1,12 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  HelpCircle,
+  CheckCircle2,
+  HandHelping,
+  Share2,
+  ArrowLeft,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { uploadPostImages } from "../lib/postHelpers";
@@ -14,12 +21,40 @@ import "../styles/posts.css";
 
 const TYPE_CARDS = {
   "lost-found": [
-    { type: "lost",  icon: "😔", label: "I Lost Something",  desc: "Post what you lost and where" },
-    { type: "found", icon: "🎉", label: "I Found Something", desc: "Help return it to its owner" },
+    {
+      type: "lost",
+      Icon: HelpCircle,
+      label: "I Lost Something",
+      desc: "Post what you lost, when, and where on campus",
+      color: "#ef4444",
+      bg: "#fee2e2",
+    },
+    {
+      type: "found",
+      Icon: CheckCircle2,
+      label: "I Found Something",
+      desc: "Help return a found item back to its rightful owner",
+      color: "#16a34a",
+      bg: "#dcfce7",
+    },
   ],
   exchange: [
-    { type: "request", icon: "🙏", label: "I Need to Borrow",  desc: "Request an item from peers" },
-    { type: "offer",   icon: "🤝", label: "I Can Lend",        desc: "Offer an item to peers" },
+    {
+      type: "request",
+      Icon: HandHelping,
+      label: "I Need to Borrow",
+      desc: "Request an item, calculator, or textbook from peers",
+      color: "#7c3aed",
+      bg: "#ede9fe",
+    },
+    {
+      type: "offer",
+      Icon: Share2,
+      label: "I Can Lend",
+      desc: "Offer a spare item or cycle to help a fellow student",
+      color: "#d97706",
+      bg: "#fef3c7",
+    },
   ],
 };
 
@@ -33,7 +68,6 @@ export default function CreatePost() {
   const preType = searchParams.get("type") || "";
   const isEdit = !!editId;
   const isExchange = mode === "exchange";
-  const isLostFound = mode === "lost-found";
   const categories = isExchange ? EXCHANGE_CATEGORIES : LOSTFOUND_CATEGORIES;
 
   // Step state — skip step 1 if type pre-selected or edit mode
@@ -73,7 +107,10 @@ export default function CreatePost() {
     e.preventDefault();
     setError("");
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setFieldErrors(errs); return; }
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      return;
+    }
     setFieldErrors({});
     setSubmitting(true);
     setUploadProgress(10);
@@ -112,7 +149,7 @@ export default function CreatePost() {
         await supabase.from("posts").update({ images: imageUrls }).eq("id", newPost.id);
       } catch (uploadErr) {
         console.error("Upload error:", uploadErr);
-        setError("Post created but upload failed: " + uploadErr.message);
+        setError("Post created but image upload failed: " + uploadErr.message);
         setSubmitting(false);
         setUploadProgress(0);
         navigate(isExchange ? `/exchange/${newPost.id}` : `/posts/${newPost.id}`);
@@ -133,21 +170,20 @@ export default function CreatePost() {
         {/* Step 1 — Type selection */}
         {step === 1 && (
           <>
-            <p className="step-label">Step 1 of 2 · {isExchange ? "Peer Exchange" : "Lost & Found"}</p>
+            <p className="step-label">Step 1 of 2 &middot; {isExchange ? "Peer Exchange" : "Lost & Found"}</p>
             <h1 className="create-post-title">{isExchange ? "What would you like to do?" : "What happened?"}</h1>
             <div className="type-cards">
-              {(TYPE_CARDS[mode] ?? TYPE_CARDS["lost-found"]).map(({ type, icon, label, desc }) => (
+              {(TYPE_CARDS[mode] ?? TYPE_CARDS["lost-found"]).map(({ type, Icon: IconComp, label, desc, color, bg }) => (
                 <button
                   key={type}
                   type="button"
                   className={`type-card ${postType === type ? "selected" : ""}`}
-                  style={postType === type && POST_TYPE_CONFIG[type]
-                    ? { borderColor: POST_TYPE_CONFIG[type].color, background: POST_TYPE_CONFIG[type].bg }
-                    : {}}
                   onClick={() => handleTypeSelect(type)}
                   id={`type-${type}-btn`}
                 >
-                  <span className="type-card-icon">{icon}</span>
+                  <div className="type-card-icon-wrap" style={{ background: bg, color }}>
+                    <IconComp size={28} strokeWidth={2.2} />
+                  </div>
                   <span className="type-card-label">{label}</span>
                   <span className="type-card-desc">{desc}</span>
                 </button>
@@ -159,20 +195,20 @@ export default function CreatePost() {
         {/* Step 2 — Details form */}
         {step === 2 && (
           <>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
               {!preType && !isEdit && (
                 <button
                   type="button"
                   className="btn btn-outline"
-                  style={{ fontSize: "0.82rem", padding: "4px 10px" }}
+                  style={{ fontSize: "0.82rem", padding: "5px 12px", display: "inline-flex", alignItems: "center", gap: 5 }}
                   onClick={() => setStep(1)}
                 >
-                  ← Back
+                  <ArrowLeft size={14} /> Back
                 </button>
               )}
               {typeCfg && (
                 <span className="step-label" style={{ margin: 0 }}>
-                  {isEdit ? "Edit Post" : "Step 2 of 2"} &nbsp;·&nbsp;
+                  {isEdit ? "Edit Post" : "Step 2 of 2"} &middot;{" "}
                   <span style={{ color: typeCfg.color, fontWeight: 800 }}>{typeCfg.label}</span>
                 </span>
               )}
@@ -193,7 +229,10 @@ export default function CreatePost() {
                   id="post-category"
                   className={`form-input form-select ${fieldErrors.category ? "input-invalid" : ""}`}
                   value={category}
-                  onChange={(e) => { setCategory(e.target.value); setFieldErrors((p) => ({ ...p, category: undefined })); }}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setFieldErrors((p) => ({ ...p, category: undefined }));
+                  }}
                 >
                   <option value="">Select a category</option>
                   {categories.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -210,9 +249,12 @@ export default function CreatePost() {
                   id="post-title"
                   type="text"
                   className={`form-input ${fieldErrors.title ? "input-invalid" : ""}`}
-                  placeholder={isExchange ? "e.g. Scientific Calculator (Casio FX-991)" : "e.g. Blue SNU ID Card"}
+                  placeholder={isExchange ? "e.g. Scientific Calculator (Casio FX-991EX)" : "e.g. Blue SNU ID Card with lanyard"}
                   value={title}
-                  onChange={(e) => { setTitle(e.target.value); setFieldErrors((p) => ({ ...p, title: undefined })); }}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    setFieldErrors((p) => ({ ...p, title: undefined }));
+                  }}
                   maxLength={100}
                 />
                 {fieldErrors.title && <p className="field-error field-error-inline">{fieldErrors.title}</p>}
@@ -227,11 +269,16 @@ export default function CreatePost() {
                   id="post-desc"
                   className={`form-input ${fieldErrors.description ? "input-invalid" : ""}`}
                   style={{ resize: "vertical", minHeight: 90, fontFamily: "var(--font)" }}
-                  placeholder={isExchange
-                    ? "Describe the item — brand, model, condition..."
-                    : "Color, brand, any identifying marks..."}
+                  placeholder={
+                    isExchange
+                      ? "Describe the item — brand, model, condition, specifications..."
+                      : "Color, brand, identifying marks, location details..."
+                  }
                   value={description}
-                  onChange={(e) => { setDescription(e.target.value); setFieldErrors((p) => ({ ...p, description: undefined })); }}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    setFieldErrors((p) => ({ ...p, description: undefined }));
+                  }}
                 />
                 {fieldErrors.description && <p className="field-error field-error-inline">{fieldErrors.description}</p>}
               </div>
@@ -246,9 +293,12 @@ export default function CreatePost() {
                     id="post-duration"
                     className={`form-input form-select ${fieldErrors.durationDays ? "input-invalid" : ""}`}
                     value={durationDays}
-                    onChange={(e) => { setDurationDays(e.target.value); setFieldErrors((p) => ({ ...p, durationDays: undefined })); }}
+                    onChange={(e) => {
+                      setDurationDays(e.target.value);
+                      setFieldErrors((p) => ({ ...p, durationDays: undefined }));
+                    }}
                   >
-                    <option value="">How long do you need/offer this?</option>
+                    <option value="">How long do you need or offer this for?</option>
                     {DURATION_OPTIONS.map((d) => (
                       <option key={d.value} value={d.value}>{d.label}</option>
                     ))}
@@ -268,9 +318,11 @@ export default function CreatePost() {
                     id="post-reason"
                     className="form-input"
                     style={{ resize: "vertical", minHeight: 70, fontFamily: "var(--font)" }}
-                    placeholder={postType === "request"
-                      ? "e.g. Exam on Friday, need it for 2 days..."
-                      : "e.g. Please return in same condition, no food near it..."}
+                    placeholder={
+                      postType === "request"
+                        ? "e.g. Mid-sem exam on Friday, needed for 2 days..."
+                        : "e.g. Please return in same condition, handle with care..."
+                    }
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                   />
@@ -286,7 +338,7 @@ export default function CreatePost() {
                   id="post-location"
                   type="text"
                   className="form-input"
-                  placeholder={isExchange ? "Where can you hand off? e.g. Library Gate" : "Where did you lose/find it?"}
+                  placeholder={isExchange ? "Where on campus can you meet? e.g. Central Library" : "Where was it lost or found?"}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
@@ -294,7 +346,9 @@ export default function CreatePost() {
 
               {/* Images */}
               <div className="form-group">
-                <label className="form-label">Images <span className="optional-label">(optional, max 4)</span></label>
+                <label className="form-label">
+                  Photos <span className="optional-label">(optional, up to 4 photos)</span>
+                </label>
                 <ImageUpload images={images} onChange={setImages} maxImages={4} maxSizeMB={5} />
               </div>
 
@@ -312,13 +366,15 @@ export default function CreatePost() {
                 className="btn btn-primary btn-full btn-lg"
                 disabled={submitting}
                 style={{
-                  marginTop: 8,
+                  marginTop: 12,
+                  padding: "14px",
+                  fontSize: "1rem",
                   ...(typeCfg && { background: typeCfg.color, borderColor: typeCfg.color }),
                 }}
               >
                 {submitting
-                  ? images.length > 0 ? `Uploading... ${uploadProgress}%` : "Posting..."
-                  : isEdit ? "Save Changes" : isExchange ? "Post Exchange →" : "Post Item →"}
+                  ? images.length > 0 ? `Uploading... ${uploadProgress}%` : "Publishing..."
+                  : isEdit ? "Save Changes" : isExchange ? "Publish Exchange Post" : "Publish Post"}
               </button>
             </form>
           </>

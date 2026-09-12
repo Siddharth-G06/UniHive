@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { supabase, isCollegeEmail } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import BrandLogo from "../components/BrandLogo";
 import "../styles/auth.css";
 
 export default function Register() {
@@ -65,7 +64,9 @@ export default function Register() {
       <div className="auth-card">
         {/* Header */}
         <div className="auth-header">
-          <span className="auth-logo-icon" aria-hidden="true">🐝</span>
+          <div className="auth-logo-wrap" style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+            <BrandLogo size={44} />
+          </div>
           <h1 className="auth-title">Create your account</h1>
           <p className="auth-subtitle">
             Available for SSN &amp; SNUC students only

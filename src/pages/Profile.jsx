@@ -1,9 +1,11 @@
-﻿import { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Check, X, Loader2, Star, Camera, Phone, User, Calendar } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { useProfile } from "../hooks/useProfile";
 import { useUsernameCheck } from "../hooks/useUsernameCheck";
 import { validateUsername, validatePhone, formatFileSize } from "../utils/collegeDetect";
+import ReputationBadge from "../components/ReputationBadge";
 import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/profile.css";
 
@@ -18,10 +20,10 @@ function CollegeBadge({ college }) {
   );
 }
 
-function Toast({ message, onDone }) {
+function Toast({ message }) {
   return (
-    <div className="toast toast-success" role="status" aria-live="polite">
-      <span>✓</span> {message}
+    <div className="toast toast-success" role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <Check size={16} /> {message}
     </div>
   );
 }
@@ -154,15 +156,12 @@ export default function Profile() {
 
           <CollegeBadge college={profile?.college} />
 
-          <div className="profile-stats">
-            <div className="stat-item">
-              <span className="stat-icon">⭐</span>
-              <span className="stat-value">{profile?.reputation_score ?? 0}</span>
-              <span className="stat-label">Reputation</span>
-            </div>
+          <div className="profile-stats" style={{ marginTop: 12 }}>
+            <ReputationBadge score={profile?.reputation_score} ratingCount={profile?.rating_count} size="lg" />
           </div>
 
-          <p className="profile-member-since">
+          <p className="profile-member-since" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 16 }}>
+            <Calendar size={14} color="var(--text-muted)" />
             <span className="info-label">Member since</span>
             <span className="info-value">{memberSince}</span>
           </p>
@@ -187,10 +186,7 @@ export default function Profile() {
                   <span className="avatar-initials">{initials}</span>
                 )}
                 <span className="avatar-overlay" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2"/>
-                  </svg>
+                  <Camera size={20} color="white" />
                 </span>
               </button>
               <input
@@ -204,7 +200,7 @@ export default function Profile() {
               />
               {avatarFile && !avatarError && (
                 <p className="avatar-file-info">
-                  {avatarFile.name} · {formatFileSize(avatarFile.size)}
+                  {avatarFile.name} &middot; {formatFileSize(avatarFile.size)}
                 </p>
               )}
               {avatarError && <p className="avatar-file-error" role="alert">{avatarError}</p>}
@@ -234,12 +230,20 @@ export default function Profile() {
                   autoComplete="username"
                 />
                 <span className="username-status" aria-live="polite">
-                  {usernameChecking && <span className="status-checking">⏳</span>}
+                  {usernameChecking && (
+                    <span className="status-checking" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <Loader2 size={13} className="spin" /> Checking
+                    </span>
+                  )}
                   {!usernameChecking && username.length >= 3 && username !== profile?.username && usernameAvailable === true && (
-                    <span className="status-available">✓ Available</span>
+                    <span className="status-available" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <Check size={13} /> Available
+                    </span>
                   )}
                   {!usernameChecking && username.length >= 3 && username !== profile?.username && usernameAvailable === false && (
-                    <span className="status-taken">✗ Already taken</span>
+                    <span className="status-taken" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <X size={13} /> Taken
+                    </span>
                   )}
                 </span>
               </div>
@@ -283,7 +287,7 @@ export default function Profile() {
         </section>
       </div>
 
-      {toast && <Toast message="Profile updated!" />}
+      {toast && <Toast message="Profile updated successfully!" />}
     </main>
   );
 }

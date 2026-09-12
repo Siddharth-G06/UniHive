@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { formatTimeAgo } from "../lib/postHelpers";
 
 /**
  * Fetches all conversations for the current user, with last message

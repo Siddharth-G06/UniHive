@@ -1,4 +1,5 @@
-﻿import { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Upload, X } from "lucide-react";
 import { formatFileSize } from "../utils/collegeDetect";
 import "../styles/posts.css";
 
@@ -76,11 +77,9 @@ export default function ImageUpload({ images = [], onChange, maxImages = 4, maxS
           aria-label="Upload images"
           onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
         >
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" className="dropzone-icon">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <Upload size={32} className="dropzone-icon" />
           <p className="dropzone-text">Click or drag images here</p>
-          <p className="dropzone-hint">Max {maxImages} images · up to {maxSizeMB}MB each</p>
+          <p className="dropzone-hint">Up to {maxImages} images &middot; max {maxSizeMB}MB each</p>
         </div>
       )}
 
@@ -119,7 +118,7 @@ export default function ImageUpload({ images = [], onChange, maxImages = 4, maxS
                   onClick={() => handleRemove(i)}
                   aria-label={`Remove image ${i + 1}`}
                 >
-                  ✕
+                  <X size={14} />
                 </button>
               </div>
             ))}

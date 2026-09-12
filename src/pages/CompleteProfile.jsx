@@ -1,10 +1,12 @@
-﻿import { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { Camera, Check, X, Loader2, ArrowRight } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { detectCollege, validateUsername, validatePhone, formatFileSize } from "../utils/collegeDetect";
 import { useUsernameCheck } from "../hooks/useUsernameCheck";
 import LoadingSpinner from "../components/LoadingSpinner";
+import BrandLogo from "../components/BrandLogo";
 import "../styles/profile.css";
 
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -124,8 +126,11 @@ export default function CompleteProfile() {
     <main className="profile-page" id="complete-profile-page">
       <div className="profile-card">
         <div className="profile-card-header">
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+            <BrandLogo size={40} />
+          </div>
           <h1 className="profile-title">Complete Your Profile</h1>
-          <p className="profile-subtitle">You&apos;re almost ready to use UniHive 🐝</p>
+          <p className="profile-subtitle">You are almost ready to start using UniHive</p>
           <div className="profile-progress">
             <div className="progress-bar">
               <div
@@ -133,7 +138,7 @@ export default function CompleteProfile() {
                 style={{ width: canSubmit ? "100%" : "40%" }}
               />
             </div>
-            <span className="progress-label">{canSubmit ? "Ready!" : "Fill in the details below"}</span>
+            <span className="progress-label">{canSubmit ? "Ready to complete!" : "Fill in your profile details"}</span>
           </div>
         </div>
 
@@ -152,10 +157,7 @@ export default function CompleteProfile() {
                 <span className="avatar-initials">{initials}</span>
               )}
               <span className="avatar-overlay" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2"/>
-                </svg>
+                <Camera size={22} color="white" />
                 <span>Change</span>
               </span>
             </button>
@@ -170,7 +172,7 @@ export default function CompleteProfile() {
             />
             {avatarFile && !avatarError && (
               <p className="avatar-file-info">
-                {avatarFile.name} · {formatFileSize(avatarFile.size)}
+                {avatarFile.name} &middot; {formatFileSize(avatarFile.size)}
               </p>
             )}
             {avatarError && (
@@ -194,12 +196,20 @@ export default function CompleteProfile() {
                 autoComplete="username"
               />
               <span className="username-status" aria-live="polite">
-                {usernameChecking && <span className="status-checking">⏳</span>}
+                {usernameChecking && (
+                  <span className="status-checking" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    <Loader2 size={13} className="spin" /> Checking
+                  </span>
+                )}
                 {!usernameChecking && username.length >= 3 && usernameAvailable === true && (
-                  <span className="status-available">✓ Available</span>
+                  <span className="status-available" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    <Check size={13} /> Available
+                  </span>
                 )}
                 {!usernameChecking && username.length >= 3 && usernameAvailable === false && (
-                  <span className="status-taken">✗ Already taken</span>
+                  <span className="status-taken" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    <X size={13} /> Taken
+                  </span>
                 )}
               </span>
             </div>
@@ -254,11 +264,12 @@ export default function CompleteProfile() {
             type="submit"
             className="btn btn-primary btn-full btn-lg"
             disabled={!canSubmit}
+            style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}
           >
             {submitting ? (
-              <><span className="btn-spinner" />Setting up...</>
+              <><Loader2 size={18} className="spin" /> Setting up...</>
             ) : (
-              "Complete Setup →"
+              <>Complete Setup <ArrowRight size={18} /></>
             )}
           </button>
         </form>

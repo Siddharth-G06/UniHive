@@ -1,4 +1,6 @@
-﻿import "../styles/chat.css";
+import { memo } from "react";
+import { Check, CheckCheck } from "lucide-react";
+import "../styles/chat.css";
 
 function formatTime(ts) {
   return new Date(ts).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
@@ -8,7 +10,7 @@ function formatTime(ts) {
  * Single message bubble.
  * @param {{ message, isOwn, isGrouped, currentUserId }} props
  */
-export default function MessageBubble({ message, isOwn, isGrouped }) {
+const MessageBubble = memo(function MessageBubble({ message, isOwn, isGrouped }) {
   const isOptimistic = message._optimistic;
   const isFailed = message._failed;
 
@@ -40,14 +42,20 @@ export default function MessageBubble({ message, isOwn, isGrouped }) {
           <span className={`bubble-time ${isOwn ? "bubble-time-own" : "bubble-time-other"}`}>
             {formatTime(message.created_at)}
             {isOwn && message.read_at && (
-              <span className="bubble-read" title="Read">✓✓</span>
+              <span className="bubble-read" title="Read" style={{ display: "inline-flex", alignItems: "center" }}>
+                <CheckCheck size={13} strokeWidth={2.5} />
+              </span>
             )}
             {isOwn && !message.read_at && !isOptimistic && (
-              <span className="bubble-sent" title="Sent">✓</span>
+              <span className="bubble-sent" title="Sent" style={{ display: "inline-flex", alignItems: "center" }}>
+                <Check size={12} strokeWidth={2.5} />
+              </span>
             )}
           </span>
         )}
       </div>
     </div>
   );
-}
+});
+
+export default MessageBubble;

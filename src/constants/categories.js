@@ -1,16 +1,16 @@
-﻿// ── Lost & Found categories ─────────────────────────────────
+// Lost & Found categories
 export const LOSTFOUND_CATEGORIES = [
   "ID Card", "Keys", "Wallet", "Phone", "Laptop",
   "Books", "Earphones", "Water Bottle", "Others",
 ];
 
-// ── Peer Exchange categories ─────────────────────────────────
+// Peer Exchange categories
 export const EXCHANGE_CATEGORIES = [
   "Cycle", "Calculator", "Scientific Calculator", "Charger",
   "Power Bank", "Umbrella", "Lab Coat", "Notebook", "Drafter", "Others",
 ];
 
-// ── Duration options ─────────────────────────────────────────
+// Duration options
 export const DURATION_OPTIONS = [
   { value: 1,  label: "1 day" },
   { value: 2,  label: "2 days" },
@@ -21,14 +21,14 @@ export const DURATION_OPTIONS = [
   { value: 30, label: "1 month" },
 ];
 
-// ── Post type config ─────────────────────────────────────────
+// Post type config — modern colors and labels
 export const POST_TYPE_CONFIG = {
   lost: {
     label: "LOST",
     color: "#ef4444",
     bg:    "#fee2e2",
     border:"#fecaca",
-    cta:   "I Found This! 🎉",
+    cta:   "I Found This",
     ctaColor: "#ef4444",
   },
   found: {
@@ -36,7 +36,7 @@ export const POST_TYPE_CONFIG = {
     color: "#16a34a",
     bg:    "#dcfce7",
     border:"#bbf7d0",
-    cta:   "This is Mine! ✋",
+    cta:   "This is Mine",
     ctaColor: "#16a34a",
   },
   request: {
@@ -44,7 +44,7 @@ export const POST_TYPE_CONFIG = {
     color: "#7c3aed",
     bg:    "#ede9fe",
     border:"#ddd6fe",
-    cta:   "I Can Lend This 🤝",
+    cta:   "I Can Lend This",
     ctaColor: "#7c3aed",
   },
   offer: {
@@ -52,32 +52,7 @@ export const POST_TYPE_CONFIG = {
     color: "#d97706",
     bg:    "#fef3c7",
     border:"#fde68a",
-    cta:   "I Need This! 🙋",
+    cta:   "I Need This",
     ctaColor: "#d97706",
   },
-};
-
-// ── Category icons (shared) ─────────────────────────────────
-export const CATEGORY_ICONS = {
-  // Lost & Found
-  "ID Card":       "🪪",
-  "Keys":          "🔑",
-  "Wallet":        "👛",
-  "Phone":         "📱",
-  "Laptop":        "💻",
-  "Books":         "📚",
-  "Earphones":     "🎧",
-  "Water Bottle":  "💧",
-  // Exchange
-  "Cycle":               "🚲",
-  "Calculator":          "🧮",
-  "Scientific Calculator":"🔬",
-  "Charger":             "🔌",
-  "Power Bank":          "🔋",
-  "Umbrella":            "☂️",
-  "Lab Coat":            "🥼",
-  "Notebook":            "📓",
-  "Drafter":             "📐",
-  // Shared
-  "Others":        "📦",
 };
