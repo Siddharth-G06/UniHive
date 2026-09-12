@@ -52,16 +52,3 @@ Only @ssn.edu.in and @snuchennai.edu.in email addresses can register.
 
 
 
-## Module Status
-
-| # | Module | Status |
-|---|--------|--------|
-| 1 | Auth & Setup | Complete |
-| 2 | User Profiles | Complete |
-| 3 | Lost & Found | Complete |
-| 4 | Peer Exchange | Complete |
-| 5 | Private Chat | Complete |
-| 6 | Ratings & Reputation | Complete |
-| 7 | Production Polish | Complete |
-
-
