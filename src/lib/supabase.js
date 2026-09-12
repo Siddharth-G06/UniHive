@@ -11,7 +11,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const ALLOWED_DOMAINS = ["ssn.edu.in", "snuchennai.edu.in"];
+// TODO: REMOVE gmail.com before deployment
+export const ALLOWED_DOMAINS = [
+  'ssn.edu.in',
+  'snu.edu.in',
+  'gmail.com'  // TESTING ONLY — DELETE THIS LINE
+]
 
 /**
  * Returns true if the given email belongs to an allowed college domain.

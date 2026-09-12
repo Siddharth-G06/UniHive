@@ -251,3 +251,43 @@ alter table public.interests add column if not exists note text;
 
 -- Enable Realtime for interests table (run in Dashboard > Database > Replication)
 -- OR run: select realtime.enable_realtime(''interests'');
+
+
+-- ============================================================
+-- MODULE 5 ADDITION: Messages read_at + Realtime
+-- Run in Supabase SQL Editor
+-- ============================================================
+
+-- Ensure read_at column exists on messages
+alter table public.messages add column if not exists read_at timestamptz;
+
+-- RLS: users can read messages in their conversations
+create policy if not exists "Conversation members can read messages"
+  on public.messages for select
+  using (
+    exists (
+      select 1 from public.conversations c
+      where c.id = conversation_id
+      and (c.user_a_id = auth.uid() or c.user_b_id = auth.uid())
+    )
+  );
+
+-- RLS: only sender can insert
+create policy if not exists "Users can send messages"
+  on public.messages for insert
+  with check (auth.uid() = sender_id);
+
+-- RLS: users can update read_at on messages they received
+create policy if not exists "Recipients can mark messages read"
+  on public.messages for update
+  using (
+    auth.uid() != sender_id and
+    exists (
+      select 1 from public.conversations c
+      where c.id = conversation_id
+      and (c.user_a_id = auth.uid() or c.user_b_id = auth.uid())
+    )
+  );
+
+-- Enable Realtime on messages table
+-- (do in Dashboard > Database > Replication > messages > Toggle ON)
