@@ -8,8 +8,10 @@ import Dashboard from "./pages/Dashboard";
 import CompleteProfile from "./pages/CompleteProfile";
 import Profile from "./pages/Profile";
 import LostFound from "./pages/LostFound";
+import Exchange from "./pages/Exchange";
 import CreatePost from "./pages/CreatePost";
 import PostDetail from "./pages/PostDetail";
+import ExchangeDetail from "./pages/ExchangeDetail";
 import MyPosts from "./pages/MyPosts";
 import LoadingSpinner from "./components/LoadingSpinner";
 
@@ -20,86 +22,29 @@ function RootRedirect() {
 }
 
 function AppRoutes() {
+  const PR = ({ children, noProfile = false }) => (
+    <ProtectedRoute requireProfileComplete={!noProfile}>{children}</ProtectedRoute>
+  );
+
   return (
     <>
       <Navbar />
       <Routes>
-        {/* Root */}
         <Route path="/" element={<RootRedirect />} />
-
-        {/* Public */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/complete-profile" element={<PR noProfile><CompleteProfile /></PR>} />
 
-        {/* Onboarding — no profile_complete check */}
-        <Route
-          path="/complete-profile"
-          element={
-            <ProtectedRoute requireProfileComplete={false}>
-              <CompleteProfile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard"        element={<PR><Dashboard /></PR>} />
+        <Route path="/profile"          element={<PR><Profile /></PR>} />
+        <Route path="/lost-found"       element={<PR><LostFound /></PR>} />
+        <Route path="/exchange"         element={<PR><Exchange /></PR>} />
+        <Route path="/create-post"      element={<PR><CreatePost /></PR>} />
+        <Route path="/posts/:id"        element={<PR><PostDetail /></PR>} />
+        <Route path="/exchange/:id"     element={<PR><ExchangeDetail /></PR>} />
+        <Route path="/edit-post/:id"    element={<PR><CreatePost /></PR>} />
+        <Route path="/my-posts"         element={<PR><MyPosts /></PR>} />
 
-        {/* Protected — requires completed profile */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/lost-found"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <LostFound />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/create-post"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <CreatePost />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/posts/:id"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <PostDetail />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/edit-post/:id"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <CreatePost />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-posts"
-          element={
-            <ProtectedRoute requireProfileComplete={true}>
-              <MyPosts />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

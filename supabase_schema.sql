@@ -232,3 +232,22 @@ create policy "Users can delete own post images"
     bucket_id = ''post-images'' and
     auth.uid()::text = (storage.foldername(name))[1]
   );
+
+
+-- ============================================================
+-- MODULE 4 ADDITION: Exchange columns + interests status column
+-- Run ONLY if these columns don''t already exist
+-- ============================================================
+
+-- Add exchange-specific columns to posts (safe to run if missing)
+alter table public.posts add column if not exists reason text;
+alter table public.posts add column if not exists duration_days integer;
+
+-- Add status + note columns to interests (for exchange flow)
+alter table public.posts add column if not exists note text;
+alter table public.interests add column if not exists status text not null default ''pending''
+  check (status in (''pending'', ''accepted'', ''rejected''));
+alter table public.interests add column if not exists note text;
+
+-- Enable Realtime for interests table (run in Dashboard > Database > Replication)
+-- OR run: select realtime.enable_realtime(''interests'');
