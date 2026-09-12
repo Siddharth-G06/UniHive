@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- UniHive — Supabase Database Schema
 -- Run this in: Supabase Dashboard > SQL Editor > New Query
 -- ============================================================
@@ -291,3 +291,47 @@ create policy if not exists "Recipients can mark messages read"
 
 -- Enable Realtime on messages table
 -- (do in Dashboard > Database > Replication > messages > Toggle ON)
+
+
+-- ============================================================
+-- MODULE 6 ADDITION: Ratings + Reputation trigger
+-- Run in Supabase SQL Editor
+-- ============================================================
+
+alter table public.users add column if not exists rating_count integer default 0;
+
+create or replace function update_reputation_score()
+returns trigger as $$
+begin
+  update public.users
+  set
+    reputation_score = (
+      select round(avg(score)::numeric, 1)
+      from public.ratings
+      where rated_user_id = new.rated_user_id
+    ),
+    rating_count = (
+      select count(*)
+      from public.ratings
+      where rated_user_id = new.rated_user_id
+    )
+  where id = new.rated_user_id;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_rating_created on public.ratings;
+create trigger on_rating_created
+  after insert on public.ratings
+  for each row execute procedure update_reputation_score();
+
+-- RLS for ratings
+alter table public.ratings enable row level security;
+
+create policy "Authenticated users can read ratings"
+  on public.ratings for select
+  using (auth.role() = 'authenticated');
+
+create policy "Users can insert ratings"
+  on public.ratings for insert
+  with check (auth.uid() = rater_id);

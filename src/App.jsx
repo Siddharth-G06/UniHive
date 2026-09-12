@@ -13,6 +13,7 @@ import CreatePost from "./pages/CreatePost";
 import PostDetail from "./pages/PostDetail";
 import ExchangeDetail from "./pages/ExchangeDetail";
 import MyPosts from "./pages/MyPosts";
+import UserProfile from './pages/UserProfile';
 import Messages from "./pages/Messages";
 import Chat from "./pages/Chat";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -47,6 +48,7 @@ function AppRoutes() {
         <Route path="/edit-post/:id"        element={<PR><CreatePost /></PR>} />
         <Route path="/my-posts"             element={<PR><MyPosts /></PR>} />
         <Route path="/messages"             element={<PR><Messages /></PR>} />
+        <Route path="/users/:username"         element={<PR><UserProfile /></PR>} />
         <Route path="/messages/:conversationId" element={<PR><Chat /></PR>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -64,3 +66,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

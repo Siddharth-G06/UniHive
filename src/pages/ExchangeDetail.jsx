@@ -1,13 +1,17 @@
 ﻿import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useInterests } from "../hooks/useInterests";
 import { formatTimeAgo, deletePostWithImages } from "../lib/postHelpers";
 import { POST_TYPE_CONFIG, CATEGORY_ICONS, DURATION_OPTIONS } from "../constants/categories";
+import { getReputationBadge, formatReputationScore } from "../utils/reputationHelpers";
+import RatingModal from "../components/RatingModal";
+import StarRating from "../components/StarRating";
 import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/posts.css";
 import "../styles/exchange.css";
+import "../styles/ratings.css";
 
 function durationLabel(days) {
   if (!days) return null;
@@ -79,6 +83,7 @@ export default function ExchangeDetail() {
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState("");
+  const [ratingModal, setRatingModal] = useState(null);
 
   // Interest state (for non-owners)
   const [myInterest, setMyInterest] = useState(null);
@@ -106,7 +111,7 @@ export default function ExchangeDetail() {
       setLoading(true);
       const { data, error } = await supabase
         .from("posts")
-        .select(`*, users!user_id ( id, username, avatar_url, reputation_score, college )`)
+        .select(`*, users!user_id ( id, username, avatar_url, reputation_score, rating_count, college )`)
         .eq("id", id)
         .single();
       if (!error && data) {
@@ -151,6 +156,8 @@ export default function ExchangeDetail() {
   const icon = CATEGORY_ICONS[post.category] ?? "📦";
   const poster = post.users;
   const images = post.images || [];
+  const badge = getReputationBadge(poster?.reputation_score, poster?.rating_count);
+  const scoreDisplay = formatReputationScore(poster?.reputation_score, poster?.rating_count);
 
   async function handleSendInterest() {
     setSendingInterest(true);
@@ -190,7 +197,20 @@ export default function ExchangeDetail() {
     await supabase.from("posts").update({ status: "resolved" }).eq("id", post.id);
     setPost((prev) => ({ ...prev, status: "resolved" }));
     setResolving(false);
-    showToast("Marked as resolved ✅");
+
+    // Open rating modal after resolving
+    const { data: conv } = await supabase
+      .from("conversations")
+      .select(`*, user_a:users!user_a_id(id, username), user_b:users!user_b_id(id, username)`)
+      .eq("post_id", post.id)
+      .maybeSingle();
+
+    if (conv) {
+      const otherUser = conv.user_a_id === user.id ? conv.user_b : conv.user_a;
+      setRatingModal({ ratedUserId: otherUser.id, ratedUsername: otherUser.username });
+    } else {
+      showToast("Marked as resolved ✅");
+    }
   }
 
   async function handleDelete() {
@@ -272,31 +292,39 @@ export default function ExchangeDetail() {
           {/* Trust signals */}
           <div className="trust-section">
             <p className="poster-label">Posted by</p>
-            <div className="poster-info">
-              {poster?.avatar_url
-                ? <img src={poster.avatar_url} alt={poster.username} className="poster-avatar" />
-                : <span className="poster-avatar-initials">{(poster?.username ?? "U")[0].toUpperCase()}</span>
-              }
-              <div>
-                <p className="poster-username">@{poster?.username ?? "—"}</p>
-                {poster?.college && (
-                  <span className={`college-badge badge-${poster.college.toLowerCase()}`} style={{ fontSize: "0.65rem" }}>
-                    {poster.college}
-                  </span>
-                )}
+            <Link to={`/users/${poster?.username}`} style={{ textDecoration: "none" }}>
+              <div className="poster-info">
+                {poster?.avatar_url
+                  ? <img src={poster.avatar_url} alt={poster.username} className="poster-avatar" />
+                  : <span className="poster-avatar-initials">{(poster?.username ?? "U")[0].toUpperCase()}</span>
+                }
+                <div>
+                  <p className="poster-username">@{poster?.username ?? "—"}</p>
+                  {poster?.college && (
+                    <span className={`college-badge badge-${poster.college.toLowerCase()}`} style={{ fontSize: "0.65rem" }}>
+                      {poster.college}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
+            </Link>
             <div className="trust-stats">
               <div className="trust-stat">
                 <span className="trust-stat-icon">⭐</span>
-                <span className="trust-stat-value">{poster?.reputation_score ?? 0}</span>
-                <span className="trust-stat-label">Reputation</span>
+                <span className="trust-stat-value">{scoreDisplay !== "New" ? scoreDisplay : "—"}</span>
+                <span className="trust-stat-label">Score</span>
               </div>
               <div className="trust-stat">
                 <span className="trust-stat-icon">🔄</span>
                 <span className="trust-stat-value">{ownerExchangeCount}</span>
                 <span className="trust-stat-label">Exchanges</span>
               </div>
+            </div>
+            <div style={{ marginTop: 8 }}>
+              <StarRating value={Math.round(poster?.reputation_score ?? 0)} readonly size="sm" />
+              <span className="rep-badge" style={{ background: badge.bg, color: badge.color, marginLeft: 6 }}>
+                {badge.icon} {badge.label}
+              </span>
             </div>
           </div>
 
@@ -455,3 +483,5 @@ export default function ExchangeDetail() {
     </main>
   );
 }
+
+
