@@ -1,4 +1,4 @@
-﻿import { useNavigate } from "react-router-dom";
+﻿import { useNavigate, Link } from "react-router-dom";
 import { formatTimeAgo, CATEGORY_ICONS } from "../lib/postHelpers";
 import { POST_TYPE_CONFIG, DURATION_OPTIONS } from "../constants/categories";
 import "../styles/posts.css";
@@ -82,7 +82,7 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
                 {(user?.username ?? "U")[0].toUpperCase()}
               </span>
             )}
-            <span className="user-name-sm">{user?.username ?? "Unknown"}</span>
+            <Link to={`/users/${user?.username}`} className="user-name-sm" style={{ textDecoration:"none",color:"inherit" }} onClick={(e)=>e.stopPropagation()}>{user?.username ?? "Unknown"}</Link>
             <span className="post-time">{formatTimeAgo(post.created_at)}</span>
           </div>
 
@@ -117,3 +117,4 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
     </article>
   );
 }
+
