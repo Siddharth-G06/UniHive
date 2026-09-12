@@ -1,21 +1,24 @@
-﻿import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeftRight, Search, X, Trash2, HandHelping, Share2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { usePosts } from "../hooks/usePosts";
-import { createInterestAndConversation, deletePostWithImages } from "../lib/postHelpers";
+import { useToast } from "../components/ToastProvider";
+import { deletePostWithImages } from "../lib/postHelpers";
 import { EXCHANGE_CATEGORIES } from "../constants/categories";
 import PostCard from "../components/PostCard";
+import PostCardSkeleton from "../components/PostCardSkeleton";
 import "../styles/posts.css";
 
 export default function Exchange() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const [typeFilter, setTypeFilter] = useState("all");
   const [category, setCategory] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [toast, setToast] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -34,19 +37,22 @@ export default function Exchange() {
 
   const activeFilterCount = [typeFilter !== "all", !!category, !!search].filter(Boolean).length;
 
-  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3500); }
-
   const handleClaim = useCallback(async (post) => {
-    if (!user) return;
     navigate(`/exchange/${post.id}`);
-  }, [user, navigate]);
+  }, [navigate]);
 
   async function handleDelete() {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !user) return;
     setDeleting(true);
     const { error: delErr } = await deletePostWithImages(deleteTarget.id, user.id, deleteTarget.images || []);
     setDeleting(false);
-    if (!delErr) { setDeleteTarget(null); refetch(); showToast("Post deleted."); }
+    if (!delErr) {
+      setDeleteTarget(null);
+      refetch();
+      showToast("Post deleted successfully.", "success");
+    } else {
+      showToast("Failed to delete post: " + delErr, "error");
+    }
   }
 
   return (
@@ -55,42 +61,46 @@ export default function Exchange() {
         {/* Header */}
         <div className="page-header">
           <div>
-            <h1 className="page-title">🔄 Peer Exchange</h1>
-            <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginTop: 2 }}>
-              Borrow and lend items with fellow students
+            <h1 className="page-title">
+              <ArrowLeftRight size={28} color="#06b6d4" /> Peer Exchange
+            </h1>
+            <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: 4 }}>
+              Borrow study materials, calculators, cycles, and lab equipment from campus peers
             </p>
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button
               id="create-request-btn"
               className="btn btn-outline"
               onClick={() => navigate("/create-post?mode=exchange&type=request")}
             >
-              🙏 Request an Item
+              <HandHelping size={16} /> Request Item
             </button>
             <button
               id="create-offer-btn"
               className="btn btn-primary"
               onClick={() => navigate("/create-post?mode=exchange&type=offer")}
             >
-              🤝 Offer an Item
+              <Share2 size={16} /> Offer Item
             </button>
           </div>
         </div>
 
         {/* Filter bar */}
-        <div className="filter-bar">
+        <div className="filter-bar-wrap">
           <div className="filter-toggles">
             {[
-              { key: "all",     label: "All" },
-              { key: "request", label: "🙏 Need" },
-              { key: "offer",   label: "🤝 Have" },
+              { key: "all",     label: "All Exchanges" },
+              { key: "request", label: "Needs (Borrow)" },
+              { key: "offer",   label: "Offers (Lend)" },
             ].map(({ key, label }) => (
               <button
                 key={key}
                 className={`filter-toggle ${typeFilter === key ? "active" : ""}`}
                 onClick={() => setTypeFilter(key)}
-              >{label}</button>
+              >
+                {label}
+              </button>
             ))}
           </div>
 
@@ -107,80 +117,118 @@ export default function Exchange() {
           </select>
 
           <div className="search-input-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-              <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
+            <Search size={16} />
             <input
               className="search-input"
               type="search"
-              placeholder="Search exchange items..."
+              placeholder="Search items, books, calculators..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              aria-label="Search exchange posts"
             />
           </div>
 
           {activeFilterCount > 0 && (
-            <span className="filter-count-badge">{activeFilterCount}</span>
+            <button
+              className="filter-clear-btn"
+              onClick={() => {
+                setTypeFilter("all");
+                setCategory("");
+                setSearchInput("");
+              }}
+            >
+              <X size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
+              Clear filters
+            </button>
           )}
         </div>
 
         {error && (
-          <div className="form-error" role="alert" style={{ marginBottom: 16 }}>
-            Feed error: {error}
+          <div className="form-error" role="alert" style={{ marginBottom: 20 }}>
+            Failed to load posts: {error}. Please refresh the page.
           </div>
         )}
 
         {/* Grid */}
         {loading && posts.length === 0 ? (
           <div className="post-grid">
-            {[1,2,3,4].map((i) => (
-              <div key={i} className="post-card" style={{ height: 340, opacity: 0.3 }} />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <PostCardSkeleton key={i} />
             ))}
           </div>
         ) : (
-          <div className="post-grid">
-            {posts.length === 0 && (
-              <div className="empty-state">
-                <div className="empty-state-icon">🔄</div>
+          <>
+            {posts.length === 0 ? (
+              <div className="empty-state-container">
+                <div className="empty-state-icon-wrap">
+                  <ArrowLeftRight size={36} strokeWidth={1.75} />
+                </div>
                 <p className="empty-state-title">No exchange posts yet</p>
-                <p className="empty-state-desc">Be the first to offer or request an item!</p>
+                <p className="empty-state-desc">
+                  {activeFilterCount > 0
+                    ? "Try adjusting your filters or search terms."
+                    : "Be the first to offer or request an item for temporary exchange!"}
+                </p>
+                {activeFilterCount === 0 && (
+                  <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => navigate("/create-post?mode=exchange&type=request")}
+                    >
+                      <HandHelping size={16} /> Request an Item
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => navigate("/create-post?mode=exchange&type=offer")}
+                    >
+                      <Share2 size={16} /> Offer an Item
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="post-grid">
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    isOwner={post.user_id === user?.id}
+                    onClaim={handleClaim}
+                    onDelete={setDeleteTarget}
+                  />
+                ))}
               </div>
             )}
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                isOwner={post.user_id === user?.id}
-                onClaim={handleClaim}
-                onDelete={setDeleteTarget}
-              />
-            ))}
-          </div>
-        )}
 
-        {hasMore && (
-          <div className="load-more-wrap">
-            <button className="btn btn-outline" onClick={loadMore}>Load More</button>
-          </div>
+            {hasMore && (
+              <div className="load-more-wrap">
+                <button className="btn btn-outline" onClick={loadMore}>
+                  Load More Exchanges
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
-
-      {toast && <div className="toast toast-success" role="status">{toast}</div>}
 
       {deleteTarget && (
         <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">Delete this post?</h2>
-            <p className="modal-desc">&ldquo;{deleteTarget.title}&rdquo; will be permanently deleted.</p>
+            <p className="modal-desc">
+              &ldquo;{deleteTarget.title}&rdquo; will be permanently deleted.
+            </p>
             <div className="modal-actions">
-              <button className="btn btn-outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</button>
+              <button className="btn btn-outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>
+                Cancel
+              </button>
               <button
                 className="btn btn-primary"
                 style={{ background: "var(--error)", borderColor: "var(--error)" }}
                 onClick={handleDelete}
                 disabled={deleting}
               >
+                <Trash2 size={16} />
                 {deleting ? "Deleting..." : "Yes, Delete"}
               </button>
             </div>

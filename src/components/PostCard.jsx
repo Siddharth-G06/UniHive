@@ -1,6 +1,9 @@
-﻿import { useNavigate, Link } from "react-router-dom";
-import { formatTimeAgo, CATEGORY_ICONS } from "../lib/postHelpers";
+import { memo } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { MapPin, Pencil, Trash2, Clock } from "lucide-react";
+import { formatTimeAgo } from "../lib/postHelpers";
 import { POST_TYPE_CONFIG, DURATION_OPTIONS } from "../constants/categories";
+import CategoryIcon from "./CategoryIcon";
 import "../styles/posts.css";
 
 const STATUS_LABELS = {
@@ -15,11 +18,10 @@ function durationLabel(days) {
   return found ? `for ${found.label}` : `for ${days} day${days > 1 ? "s" : ""}`;
 }
 
-export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
+const PostCard = memo(function PostCard({ post, onClaim, isOwner = false, onDelete }) {
   const navigate = useNavigate();
   const typeCfg = POST_TYPE_CONFIG[post.type] ?? POST_TYPE_CONFIG.lost;
   const status = STATUS_LABELS[post.status] ?? STATUS_LABELS.active;
-  const icon = CATEGORY_ICONS[post.category] ?? "📦";
   const firstImage = post.images?.[0];
   const user = post.users;
   const isExchange = post.type === "request" || post.type === "offer";
@@ -37,13 +39,26 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
       {/* Image / Placeholder */}
       <div className="post-card-image">
         {firstImage ? (
-          <img src={firstImage} alt={post.title} className="post-card-img" loading="lazy" />
+          <img
+            src={firstImage}
+            alt={post.title}
+            className="post-card-img"
+            loading="lazy"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = "none";
+            }}
+          />
         ) : (
           <div className="post-card-placeholder">
-            <span className="placeholder-icon">{icon}</span>
+            <div className="placeholder-icon-pill">
+              <CategoryIcon category={post.category} size={36} className="placeholder-icon-svg" />
+            </div>
+            <span className="placeholder-category-text">{post.category || "Item"}</span>
           </div>
         )}
-        {/* Type badge using config colors */}
+
+        {/* Type badge */}
         <span
           className="type-badge"
           style={{
@@ -54,23 +69,34 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
         >
           {typeCfg.label}
         </span>
+
         {/* Status badge */}
         <span className={`status-badge ${status.cls}`}>{status.label}</span>
       </div>
 
       {/* Body */}
       <div className="post-card-body">
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-          <span className="post-card-category">{icon} {post.category}</span>
+        <div className="post-card-meta-row">
+          <span className="post-card-category">
+            <CategoryIcon category={post.category} size={13} style={{ marginRight: 4 }} />
+            {post.category}
+          </span>
           {post.duration_days && (
-            <span className="duration-badge">{durationLabel(post.duration_days)}</span>
+            <span className="duration-badge">
+              <Clock size={11} style={{ marginRight: 3 }} />
+              {durationLabel(post.duration_days)}
+            </span>
           )}
         </div>
+
         <h3 className="post-card-title">{post.title}</h3>
         <p className="post-card-desc">{post.description}</p>
 
         {post.location && (
-          <p className="post-card-location"><span aria-hidden="true">📍</span> {post.location}</p>
+          <p className="post-card-location">
+            <MapPin size={13} style={{ flexShrink: 0 }} />
+            <span>{post.location}</span>
+          </p>
         )}
 
         <div className="post-card-footer">
@@ -82,7 +108,13 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
                 {(user?.username ?? "U")[0].toUpperCase()}
               </span>
             )}
-            <Link to={`/users/${user?.username}`} className="user-name-sm" style={{ textDecoration:"none",color:"inherit" }} onClick={(e)=>e.stopPropagation()}>{user?.username ?? "Unknown"}</Link>
+            <Link
+              to={`/users/${user?.username}`}
+              className="user-name-sm"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {user?.username ?? "Unknown"}
+            </Link>
             <span className="post-time">{formatTimeAgo(post.created_at)}</span>
           </div>
 
@@ -91,22 +123,35 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
               <button
                 className="icon-btn"
                 title="Edit"
-                onClick={(e) => { e.stopPropagation(); navigate(`/edit-post/${post.id}`); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/edit-post/${post.id}`);
+                }}
                 aria-label="Edit post"
-              >✏️</button>
+              >
+                <Pencil size={14} />
+              </button>
               <button
                 className="icon-btn icon-btn-danger"
                 title="Delete"
-                onClick={(e) => { e.stopPropagation(); onDelete?.(post); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(post);
+                }}
                 aria-label="Delete post"
-              >🗑️</button>
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
           ) : (
             post.status === "active" && (
               <button
                 className="btn-cta-sm"
                 style={{ background: typeCfg.ctaColor, borderColor: typeCfg.ctaColor }}
-                onClick={(e) => { e.stopPropagation(); onClaim?.(post); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClaim?.(post);
+                }}
               >
                 {typeCfg.cta}
               </button>
@@ -116,5 +161,6 @@ export default function PostCard({ post, onClaim, isOwner = false, onDelete }) {
       </div>
     </article>
   );
-}
+});
 
+export default PostCard;

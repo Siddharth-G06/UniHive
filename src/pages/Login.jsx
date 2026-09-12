@@ -1,9 +1,9 @@
-﻿import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import BrandLogo from "../components/BrandLogo";
 import "../styles/auth.css";
 
 const MicrosoftIcon = () => (
@@ -42,7 +42,6 @@ export default function Login() {
       setError(error.message);
       setSubmitting(false);
     }
-    // On success, browser redirects — no navigate() needed
   }
 
   async function handleEmailLogin(e) {
@@ -63,7 +62,9 @@ export default function Login() {
       <div className="auth-card">
         {/* Header */}
         <div className="auth-header">
-          <span className="auth-logo-icon" aria-hidden="true">🐝</span>
+          <div className="auth-logo-wrap" style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+            <BrandLogo size={44} />
+          </div>
           <h1 className="auth-title">Welcome to UniHive</h1>
           <p className="auth-subtitle">Your campus marketplace for SSN &amp; SNUC students</p>
         </div>

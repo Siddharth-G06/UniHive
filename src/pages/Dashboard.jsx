@@ -1,5 +1,17 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  HelpCircle,
+  CheckCircle2,
+  ArrowLeftRight,
+  Pin,
+  Search,
+  PlusCircle,
+  HandHelping,
+  Share2,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import PostCard from "../components/PostCard";
@@ -9,16 +21,58 @@ import "../styles/posts.css";
 function greeting(name) {
   const h = new Date().getHours();
   const time = h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
-  return `Good ${time}, ${name}! 👋`;
+  return `Good ${time}, ${name}!`;
 }
 
 const QUICK_ACTIONS = [
-  { id: "qa-report-lost",    to: "/create-post?mode=lost-found&type=lost",    icon: "😔", label: "Report Lost Item",   color: "#ef4444" },
-  { id: "qa-report-found",   to: "/create-post?mode=lost-found&type=found",   icon: "🎉", label: "Report Found Item",  color: "#16a34a" },
-  { id: "qa-request-borrow", to: "/create-post?mode=exchange&type=request",   icon: "🙏", label: "Request to Borrow",  color: "#7c3aed" },
-  { id: "qa-offer-lend",     to: "/create-post?mode=exchange&type=offer",     icon: "🤝", label: "Offer to Lend",      color: "#d97706" },
-  { id: "qa-browse-lf",      to: "/lost-found",                                icon: "🔍", label: "Browse Lost & Found", color: "#2563eb" },
-  { id: "qa-browse-ex",      to: "/exchange",                                  icon: "🔄", label: "Browse Exchange",    color: "#0891b2" },
+  {
+    id: "qa-report-lost",
+    to: "/create-post?mode=lost-found&type=lost",
+    Icon: HelpCircle,
+    label: "Report Lost Item",
+    color: "#ef4444",
+    bg: "rgba(239, 68, 68, 0.15)",
+  },
+  {
+    id: "qa-report-found",
+    to: "/create-post?mode=lost-found&type=found",
+    Icon: CheckCircle2,
+    label: "Report Found Item",
+    color: "#16a34a",
+    bg: "rgba(22, 163, 74, 0.15)",
+  },
+  {
+    id: "qa-request-borrow",
+    to: "/create-post?mode=exchange&type=request",
+    Icon: HandHelping,
+    label: "Request to Borrow",
+    color: "#7c3aed",
+    bg: "rgba(124, 58, 237, 0.15)",
+  },
+  {
+    id: "qa-offer-lend",
+    to: "/create-post?mode=exchange&type=offer",
+    Icon: Share2,
+    label: "Offer to Lend",
+    color: "#d97706",
+    bg: "rgba(217, 119, 6, 0.15)",
+  },
+  {
+    id: "qa-browse-lf",
+    to: "/lost-found",
+    Icon: Search,
+    label: "Browse Lost & Found",
+    color: "#3b82f6",
+    bg: "rgba(59, 130, 246, 0.15)",
+  },
+  {
+    id: "qa-browse-ex",
+    to: "/exchange",
+    Icon: ArrowLeftRight,
+    label: "Browse Peer Exchange",
+    color: "#06b6d4",
+    bg: "rgba(6, 182, 212, 0.15)",
+  },
 ];
 
 export default function Dashboard() {
@@ -63,10 +117,34 @@ export default function Dashboard() {
   }, [user?.id]);
 
   const STAT_CARDS = [
-    { icon: "😔", label: "Active Lost Items",         value: stats.lost,     color: "#ef4444", bg: "#fee2e2" },
-    { icon: "🎉", label: "Active Found Items",         value: stats.found,    color: "#16a34a", bg: "#dcfce7" },
-    { icon: "🔄", label: "Items Available to Borrow", value: stats.exchange,  color: "#7c3aed", bg: "#ede9fe" },
-    { icon: "📌", label: "Your Active Posts",          value: stats.myActive, color: "#2563eb", bg: "#dbeafe" },
+    {
+      Icon: HelpCircle,
+      label: "Active Lost Items",
+      value: stats.lost,
+      color: "#ef4444",
+      bg: "rgba(239, 68, 68, 0.2)",
+    },
+    {
+      Icon: CheckCircle2,
+      label: "Active Found Items",
+      value: stats.found,
+      color: "#16a34a",
+      bg: "rgba(22, 163, 74, 0.2)",
+    },
+    {
+      Icon: ArrowLeftRight,
+      label: "Items to Borrow / Lend",
+      value: stats.exchange,
+      color: "#a855f7",
+      bg: "rgba(168, 85, 247, 0.2)",
+    },
+    {
+      Icon: Pin,
+      label: "Your Active Posts",
+      value: stats.myActive,
+      color: "#3b82f6",
+      bg: "rgba(59, 130, 246, 0.2)",
+    },
   ];
 
   return (
@@ -74,56 +152,99 @@ export default function Dashboard() {
       <div className="dashboard-hero">
         <div className="dashboard-hero-glow" aria-hidden="true" />
         <div className="dashboard-content">
-          {/* Greeting */}
-          <h1 className="dashboard-heading" style={{ fontSize: "1.8rem", marginBottom: 6 }}>
-            {greeting(displayName)}
-          </h1>
-          <p className="dashboard-subheading" style={{ marginBottom: 32 }}>
-            Here&apos;s what&apos;s happening on your campus today.
-          </p>
+
+          {/* Top greeting banner */}
+          <div className="dashboard-topbar">
+            <div>
+              <h1 className="dashboard-heading">
+                {greeting(displayName)}
+              </h1>
+              <p className="dashboard-subheading">
+                Here is what is happening on your campus today.
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                className="btn btn-outline"
+                style={{ color: "#ffffff", borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.06)" }}
+                onClick={() => navigate("/lost-found")}
+              >
+                <Search size={16} /> Lost &amp; Found
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => navigate("/create-post")}
+              >
+                <PlusCircle size={16} /> Create Post
+              </button>
+            </div>
+          </div>
 
           {/* Stats row */}
           <div className="stats-row">
-            {STAT_CARDS.map((s) => (
-              <div key={s.label} className="stat-card" style={{ "--stat-color": s.color, "--stat-bg": s.bg }}>
-                <span className="stat-card-icon">{s.icon}</span>
-                <span className="stat-card-value">
-                  {loadingStats ? <span className="stat-skeleton" /> : s.value}
-                </span>
-                <span className="stat-card-label">{s.label}</span>
-              </div>
-            ))}
+            {STAT_CARDS.map((s) => {
+              const IconComp = s.Icon;
+              return (
+                <div key={s.label} className="stat-card" style={{ "--stat-color": s.color, "--stat-bg": s.bg }}>
+                  <div className="stat-card-icon">
+                    <IconComp size={26} strokeWidth={2.2} />
+                  </div>
+                  <div className="stat-card-info">
+                    <span className="stat-card-value">
+                      {loadingStats ? <span className="stat-skeleton" /> : s.value}
+                    </span>
+                    <span className="stat-card-label">{s.label}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Quick Actions */}
           <section className="dash-section">
-            <h2 className="dash-section-title">Quick Actions</h2>
+            <div className="dash-section-header">
+              <h2 className="dash-section-title">
+                <Sparkles size={20} color="#60a5fa" /> Quick Actions
+              </h2>
+            </div>
             <div className="quick-actions-grid">
-              {QUICK_ACTIONS.map((qa) => (
-                <Link key={qa.id} id={qa.id} to={qa.to} className="quick-action-card">
-                  <span className="qa-icon" style={{ background: qa.color + "22", color: qa.color }}>
-                    {qa.icon}
-                  </span>
-                  <span className="qa-label">{qa.label}</span>
-                </Link>
-              ))}
+              {QUICK_ACTIONS.map((qa) => {
+                const IconComp = qa.Icon;
+                return (
+                  <Link key={qa.id} id={qa.id} to={qa.to} className="quick-action-card">
+                    <span className="qa-icon" style={{ background: qa.bg, color: qa.color }}>
+                      <IconComp size={24} strokeWidth={2.2} />
+                    </span>
+                    <span className="qa-label">{qa.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </section>
 
           {/* Recent Lost & Found */}
           <section className="dash-section">
             <div className="dash-section-header">
-              <h2 className="dash-section-title">Recent Lost &amp; Found</h2>
-              <Link to="/lost-found" className="dash-section-link">View all →</Link>
+              <h2 className="dash-section-title">
+                <Search size={20} color="#ef4444" /> Recent Lost &amp; Found
+              </h2>
+              <Link to="/lost-found" className="dash-section-link">
+                View all <ArrowRight size={16} />
+              </Link>
             </div>
             {loadingStats ? (
               <div className="post-grid">
                 {[1,2,3].map((i) => <div key={i} className="post-card" style={{ height: 280, opacity: 0.3 }} />)}
               </div>
             ) : recentLF.length === 0 ? (
-              <p className="dash-empty">No active posts yet. <Link to="/create-post?mode=lost-found" style={{ color: "rgba(255,255,255,.7)" }}>Be the first!</Link></p>
+              <p className="dash-empty">
+                No active posts yet.{" "}
+                <Link to="/create-post?mode=lost-found" style={{ color: "#93c5fd", fontWeight: 700 }}>
+                  Be the first to post!
+                </Link>
+              </p>
             ) : (
-              <div className="post-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+              <div className="post-grid">
                 {recentLF.map((post) => (
                   <PostCard
                     key={post.id}
@@ -136,20 +257,29 @@ export default function Dashboard() {
             )}
           </section>
 
-          {/* Recent Exchange */}
+          {/* Recent Peer Exchange */}
           <section className="dash-section">
             <div className="dash-section-header">
-              <h2 className="dash-section-title">Recent Exchange</h2>
-              <Link to="/exchange" className="dash-section-link">View all →</Link>
+              <h2 className="dash-section-title">
+                <ArrowLeftRight size={20} color="#06b6d4" /> Recent Peer Exchange
+              </h2>
+              <Link to="/exchange" className="dash-section-link">
+                View all <ArrowRight size={16} />
+              </Link>
             </div>
             {loadingStats ? (
               <div className="post-grid">
                 {[1,2,3].map((i) => <div key={i} className="post-card" style={{ height: 280, opacity: 0.3 }} />)}
               </div>
             ) : recentEx.length === 0 ? (
-              <p className="dash-empty">No exchange posts yet. <Link to="/create-post?mode=exchange" style={{ color: "rgba(255,255,255,.7)" }}>Start one!</Link></p>
+              <p className="dash-empty">
+                No exchange posts yet.{" "}
+                <Link to="/create-post?mode=exchange" style={{ color: "#93c5fd", fontWeight: 700 }}>
+                  Start an exchange request or offer!
+                </Link>
+              </p>
             ) : (
-              <div className="post-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+              <div className="post-grid">
                 {recentEx.map((post) => (
                   <PostCard
                     key={post.id}
@@ -161,6 +291,7 @@ export default function Dashboard() {
               </div>
             )}
           </section>
+
         </div>
       </div>
     </main>

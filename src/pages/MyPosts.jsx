@@ -1,5 +1,6 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Pin, Plus, Inbox, CheckCircle2, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { usePosts } from "../hooks/usePosts";
 import { deletePostWithImages } from "../lib/postHelpers";
@@ -8,9 +9,9 @@ import PostCard from "../components/PostCard";
 import "../styles/posts.css";
 
 const TABS = [
-  { key: "all",      label: "All" },
+  { key: "all",      label: "All Posts" },
   { key: "active",   label: "Active" },
-  { key: "claimed",  label: "Claimed" },
+  { key: "claimed",  label: "In Progress" },
   { key: "resolved", label: "Resolved" },
 ];
 
@@ -36,7 +37,7 @@ export default function MyPosts() {
   async function handleQuickResolve(post) {
     await supabase.from("posts").update({ status: "resolved" }).eq("id", post.id);
     refetch();
-    showToast("Marked as resolved ✅");
+    showToast("Marked as resolved!");
   }
 
   async function handleDelete() {
@@ -47,7 +48,7 @@ export default function MyPosts() {
     if (!error) {
       setDeleteTarget(null);
       refetch();
-      showToast("Post deleted.");
+      showToast("Post deleted successfully.");
     }
   }
 
@@ -55,9 +56,11 @@ export default function MyPosts() {
     <main style={{ flex: 1, background: "var(--background)" }}>
       <div className="page-container">
         <div className="page-header">
-          <h1 className="page-title">📌 My Posts</h1>
+          <h1 className="page-title">
+            <Pin size={28} color="var(--primary)" /> My Posts
+          </h1>
           <button className="btn btn-primary" onClick={() => navigate("/create-post?mode=lost-found")}>
-            + New Post
+            <Plus size={16} /> New Post
           </button>
         </div>
 
@@ -78,24 +81,26 @@ export default function MyPosts() {
         {/* Grid */}
         {loading && posts.length === 0 ? (
           <div className="post-grid">
-            {[1,2].map((i) => <div key={i} className="post-card" style={{ height: 300, opacity: 0.4 }} />)}
+            {[1, 2, 3].map((i) => <div key={i} className="post-card" style={{ height: 320, opacity: 0.4 }} />)}
           </div>
         ) : (
           <div className="post-grid">
             {posts.length === 0 && (
-              <div className="empty-state">
-                <div className="empty-state-icon">📭</div>
+              <div className="empty-state-container">
+                <div className="empty-state-icon-wrap">
+                  <Inbox size={36} strokeWidth={1.75} />
+                </div>
                 <p className="empty-state-title">No {activeTab === "all" ? "" : activeTab} posts yet</p>
                 <p className="empty-state-desc">
                   {activeTab === "all"
-                    ? "Post your first lost or found item to get started!"
-                    : `You have no ${activeTab} posts.`}
+                    ? "Post your first lost or found item or exchange to get started!"
+                    : `You have no ${activeTab} posts right now.`}
                 </p>
               </div>
             )}
 
             {posts.map((post) => (
-              <div key={post.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div key={post.id} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <PostCard
                   post={post}
                   isOwner={true}
@@ -104,10 +109,10 @@ export default function MyPosts() {
                 {post.status === "active" && (
                   <button
                     className="btn btn-outline"
-                    style={{ fontSize: "0.8rem", padding: "6px 12px" }}
+                    style={{ fontSize: "0.82rem", padding: "8px 14px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                     onClick={() => handleQuickResolve(post)}
                   >
-                    ✅ Mark as Resolved
+                    <CheckCircle2 size={15} /> Mark as Resolved
                   </button>
                 )}
               </div>
@@ -117,7 +122,9 @@ export default function MyPosts() {
 
         {hasMore && (
           <div className="load-more-wrap">
-            <button className="btn btn-outline" onClick={loadMore}>Load More</button>
+            <button className="btn btn-outline" onClick={loadMore}>
+              Load More Posts
+            </button>
           </div>
         )}
       </div>
@@ -134,13 +141,16 @@ export default function MyPosts() {
               &ldquo;{deleteTarget.title}&rdquo; will be permanently deleted. This cannot be undone.
             </p>
             <div className="modal-actions">
-              <button className="btn btn-outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</button>
+              <button className="btn btn-outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>
+                Cancel
+              </button>
               <button
                 className="btn btn-primary"
                 style={{ background: "var(--error)", borderColor: "var(--error)" }}
                 onClick={handleDelete}
                 disabled={deleting}
               >
+                <Trash2 size={16} />
                 {deleting ? "Deleting..." : "Yes, Delete"}
               </button>
             </div>

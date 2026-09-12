@@ -1,4 +1,4 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 @import "./variables.css";
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,6 +12,9 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #root { display: flex; flex-direction: column; min-height: 100vh; }
@@ -47,7 +50,7 @@ body {
 .btn-primary:not(:disabled):hover {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
-  box-shadow: 0 4px 14px rgba(37,99,235,.35);
+  box-shadow: 0 4px 14px var(--primary-glow);
 }
 
 .btn-outline {
@@ -65,32 +68,32 @@ body {
   border-color: var(--border);
 }
 .btn-outline-dark:not(:disabled):hover {
-  background: var(--border);
+  background: var(--surface-alt);
 }
 
 .btn-full { width: 100%; }
 
 .btn-microsoft {
-  background: #fff;
-  color: #1e293b;
-  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--border);
   width: 100%;
   font-size: 0.95rem;
   padding: 12px 20px;
   box-shadow: var(--shadow-sm);
 }
 .btn-microsoft:not(:disabled):hover {
-  background: #f1f5f9;
+  background: var(--surface-alt);
   box-shadow: var(--shadow-md);
-  border-color: #cbd5e1;
+  border-color: var(--border-subtle);
 }
 
 /* ---- Form shared ---- */
-.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
 
 .form-label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: var(--text);
 }
 
@@ -107,28 +110,34 @@ body {
 }
 .form-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
-.form-input::placeholder { color: #94a3b8; }
+.form-input::placeholder { color: var(--text-muted); }
+
+/* Ensure selects display dark background options in dark mode */
+select.form-input option {
+  background: var(--surface);
+  color: var(--text);
+}
 
 .form-error {
   background: var(--error-bg);
   color: var(--error);
-  border: 1px solid #fecaca;
+  border: 1px solid var(--error-border);
   border-radius: var(--radius);
-  padding: 10px 14px;
-  font-size: 0.875rem;
-  margin-bottom: 12px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
 }
 
 .form-success {
   background: var(--success-bg);
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
   border-radius: var(--radius);
-  padding: 10px 14px;
-  font-size: 0.875rem;
-  margin-bottom: 12px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
 }
 
 .placeholder-notice {
@@ -139,4 +148,27 @@ body {
   border: 2px dashed var(--border);
   border-radius: var(--radius);
   margin-top: 12px;
+}
+
+/* ============================================================
+   RESPONSIVE TOKENS & CONTAINERS
+   ============================================================ */
+.page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 28px;
+}
+
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  .page-container { padding: 20px 16px; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }

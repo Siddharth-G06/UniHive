@@ -1,16 +1,67 @@
-# React + Vite
+﻿# UniHive
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+### Campus Community Platform
 
-Currently, two official plugins are available:
+A private digital platform exclusively for **SSN College of Engineering** and **Shiv Nadar University Chennai** students. Find lost items. Borrow essentials. Build campus trust.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What It Does
 
-## React Compiler
+**Lost & Found Hub**: Post lost or found items with photos, browse by category, claim items through private messaging.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Peer Exchange**: Request to borrow or offer to lend items with duration, trust scores, and ratings.
 
-## Expanding the Oxlint configuration
+**Private Messaging**: Real-time chat linked to the specific post that started the conversation. Full read receipts and unread counts.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18 (Vite), React Router v6 |
+| Styling | Vanilla CSS, custom design system |
+| Backend | Supabase (PostgreSQL, Auth, Realtime, Storage) |
+| Authentication | Microsoft OAuth (Azure AD) + Email/Password |
+| Real-time | Supabase Realtime (WebSocket subscriptions) |
+| Deployment | Vercel (CDN, SPA rewrites) |
+
+## Local Development
+
+### Prerequisites
+- Node.js 18+
+- A Supabase project
+
+### Setup
+
+1. Clone and install:
+   npm install
+
+2. Create .env.local:
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+3. Run supabase_schema.sql in the Supabase SQL Editor.
+
+4. Start dev server:
+   npm run dev
+
+## Access Restriction
+
+Only @ssn.edu.in and @snuchennai.edu.in email addresses can register.
+- Microsoft OAuth: Enforced at the Azure AD identity provider level
+- Email/Password: Domain validated before signup in src/lib/supabase.js
+
+
+
+## Module Status
+
+| # | Module | Status |
+|---|--------|--------|
+| 1 | Auth & Setup | Complete |
+| 2 | User Profiles | Complete |
+| 3 | Lost & Found | Complete |
+| 4 | Peer Exchange | Complete |
+| 5 | Private Chat | Complete |
+| 6 | Ratings & Reputation | Complete |
+| 7 | Production Polish | Complete |
+
+

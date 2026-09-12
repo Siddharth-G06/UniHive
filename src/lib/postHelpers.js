@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-export { CATEGORY_ICONS, LOSTFOUND_CATEGORIES as CATEGORIES } from "../constants/categories";
+export { LOSTFOUND_CATEGORIES as CATEGORIES, LOSTFOUND_CATEGORIES, EXCHANGE_CATEGORIES } from "../constants/categories";
 
 // ─── Time formatting ────────────────────────────────────────────
 /**
@@ -8,6 +8,7 @@ export { CATEGORY_ICONS, LOSTFOUND_CATEGORIES as CATEGORIES } from "../constants
  * @returns {string}
  */
 export function formatTimeAgo(timestamp) {
+  if (!timestamp) return "";
   const now = new Date();
   const then = new Date(timestamp);
   const diff = Math.floor((now - then) / 1000); // seconds
@@ -53,7 +54,7 @@ export async function uploadPostImages(files, postId, userId) {
  * Expresses interest in a post (Lost/Found) and creates a conversation.
  * - Inserts into interests (idempotent check before calling)
  * - Inserts into conversations
- * - Updates post status to ''claimed''
+ * - Updates post status to 'claimed'
  * @returns {{ conversationId: string | null, error: string | null }}
  */
 export async function createInterestAndConversation(postId, postOwnerId, currentUserId) {
@@ -104,7 +105,6 @@ export async function deletePostWithImages(postId, userId, imageUrls = []) {
   // Remove storage files
   if (imageUrls.length > 0) {
     const paths = imageUrls.map((url) => {
-      // Extract path after /object/public/post-images/
       const marker = "/object/public/post-images/";
       const idx = url.indexOf(marker);
       return idx !== -1 ? url.slice(idx + marker.length) : null;
@@ -118,5 +118,3 @@ export async function deletePostWithImages(postId, userId, imageUrls = []) {
   const { error } = await supabase.from("posts").delete().eq("id", postId);
   return { error: error?.message ?? null };
 }
-
-// CATEGORY_ICONS and CATEGORIES are re-exported from constants/categories.js above.
