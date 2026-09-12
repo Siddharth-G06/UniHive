@@ -2,28 +2,51 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
-import { uploadPostImages, CATEGORIES } from "../lib/postHelpers";
+import { uploadPostImages } from "../lib/postHelpers";
+import {
+  LOSTFOUND_CATEGORIES,
+  EXCHANGE_CATEGORIES,
+  DURATION_OPTIONS,
+  POST_TYPE_CONFIG,
+} from "../constants/categories";
 import ImageUpload from "../components/ImageUpload";
 import "../styles/posts.css";
+
+const TYPE_CARDS = {
+  "lost-found": [
+    { type: "lost",  icon: "😔", label: "I Lost Something",  desc: "Post what you lost and where" },
+    { type: "found", icon: "🎉", label: "I Found Something", desc: "Help return it to its owner" },
+  ],
+  exchange: [
+    { type: "request", icon: "🙏", label: "I Need to Borrow",  desc: "Request an item from peers" },
+    { type: "offer",   icon: "🤝", label: "I Can Lend",        desc: "Offer an item to peers" },
+  ],
+};
 
 export default function CreatePost() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { id: editId } = useParams();
   const { user } = useAuth();
+
   const mode = searchParams.get("mode") || "lost-found";
+  const preType = searchParams.get("type") || "";
   const isEdit = !!editId;
+  const isExchange = mode === "exchange";
   const isLostFound = mode === "lost-found";
+  const categories = isExchange ? EXCHANGE_CATEGORIES : LOSTFOUND_CATEGORIES;
 
-  // Step 1
-  const [postType, setPostType] = useState(isEdit ? "lost" : "");
-  const [step, setStep] = useState(isEdit || mode === "exchange" ? 2 : 1);
+  // Step state — skip step 1 if type pre-selected or edit mode
+  const [postType, setPostType] = useState(preType || (isEdit ? "lost" : ""));
+  const [step, setStep] = useState(preType || isEdit ? 2 : 1);
 
-  // Step 2 fields
+  // Form fields
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [durationDays, setDurationDays] = useState("");
+  const [reason, setReason] = useState("");
   const [images, setImages] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
@@ -41,7 +64,8 @@ export default function CreatePost() {
     if (!category) errs.category = "Please select a category.";
     if (!title.trim()) errs.title = "Title is required.";
     if (!description.trim()) errs.description = "Description is required.";
-    if (isLostFound && !postType) errs.postType = "Please select Lost or Found first.";
+    if (!postType) errs.postType = "Please select a type first.";
+    if (isExchange && !durationDays) errs.durationDays = "Please select a duration.";
     return errs;
   }
 
@@ -49,10 +73,7 @@ export default function CreatePost() {
     e.preventDefault();
     setError("");
     const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setFieldErrors(errs);
-      return;
-    }
+    if (Object.keys(errs).length > 0) { setFieldErrors(errs); return; }
     setFieldErrors({});
     setSubmitting(true);
     setUploadProgress(10);
@@ -61,13 +82,15 @@ export default function CreatePost() {
       .from("posts")
       .insert({
         user_id: user.id,
-        type: postType || "offer",
+        type: postType,
         category,
         title: title.trim(),
         description: description.trim(),
         location: location.trim() || null,
         status: "active",
         images: [],
+        ...(isExchange && durationDays && { duration_days: parseInt(durationDays) }),
+        ...(isExchange && reason.trim() && { reason: reason.trim() }),
       })
       .select()
       .single();
@@ -88,77 +111,75 @@ export default function CreatePost() {
         setUploadProgress(85);
         await supabase.from("posts").update({ images: imageUrls }).eq("id", newPost.id);
       } catch (uploadErr) {
-        console.error("Image upload error:", uploadErr);
-        setError("Post created but image upload failed: " + uploadErr.message);
+        console.error("Upload error:", uploadErr);
+        setError("Post created but upload failed: " + uploadErr.message);
         setSubmitting(false);
         setUploadProgress(0);
-        navigate(`/posts/${newPost.id}`);
+        navigate(isExchange ? `/exchange/${newPost.id}` : `/posts/${newPost.id}`);
         return;
       }
     }
 
     setUploadProgress(100);
-    navigate(`/posts/${newPost.id}`);
+    navigate(isExchange ? `/exchange/${newPost.id}` : `/posts/${newPost.id}`);
   }
+
+  const typeCfg = POST_TYPE_CONFIG[postType];
 
   return (
     <main className="create-post-page" id="create-post-page">
       <div className="create-post-card">
 
-        {/* ── Step 1: Type selection ── */}
-        {step === 1 && isLostFound && (
+        {/* Step 1 — Type selection */}
+        {step === 1 && (
           <>
-            <p className="step-label">Step 1 of 2</p>
-            <h1 className="create-post-title">What happened?</h1>
+            <p className="step-label">Step 1 of 2 · {isExchange ? "Peer Exchange" : "Lost & Found"}</p>
+            <h1 className="create-post-title">{isExchange ? "What would you like to do?" : "What happened?"}</h1>
             <div className="type-cards">
-              <button
-                type="button"
-                className={`type-card ${postType === "lost" ? "selected" : ""}`}
-                onClick={() => handleTypeSelect("lost")}
-                id="type-lost-btn"
-              >
-                <span className="type-card-icon">😔</span>
-                <span className="type-card-label">I Lost Something</span>
-                <span className="type-card-desc">Post what you lost and where</span>
-              </button>
-              <button
-                type="button"
-                className={`type-card ${postType === "found" ? "selected" : ""}`}
-                onClick={() => handleTypeSelect("found")}
-                id="type-found-btn"
-              >
-                <span className="type-card-icon">🎉</span>
-                <span className="type-card-label">I Found Something</span>
-                <span className="type-card-desc">Help return it to its owner</span>
-              </button>
+              {(TYPE_CARDS[mode] ?? TYPE_CARDS["lost-found"]).map(({ type, icon, label, desc }) => (
+                <button
+                  key={type}
+                  type="button"
+                  className={`type-card ${postType === type ? "selected" : ""}`}
+                  style={postType === type && POST_TYPE_CONFIG[type]
+                    ? { borderColor: POST_TYPE_CONFIG[type].color, background: POST_TYPE_CONFIG[type].bg }
+                    : {}}
+                  onClick={() => handleTypeSelect(type)}
+                  id={`type-${type}-btn`}
+                >
+                  <span className="type-card-icon">{icon}</span>
+                  <span className="type-card-label">{label}</span>
+                  <span className="type-card-desc">{desc}</span>
+                </button>
+              ))}
             </div>
           </>
         )}
 
-        {/* ── Step 2: Details form ── */}
+        {/* Step 2 — Details form */}
         {step === 2 && (
           <>
-            {isLostFound && (
-              <>
-                <p className="step-label">
-                  Step 2 of 2 &nbsp;·&nbsp;
-                  <span className={`type-badge ${postType === "lost" ? "badge-lost" : "badge-found"}`}
-                    style={{ position: "static", fontSize: "0.72rem", padding: "2px 8px" }}>
-                    {postType === "lost" ? "LOST" : "FOUND"}
-                  </span>
-                </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              {!preType && !isEdit && (
                 <button
                   type="button"
                   className="btn btn-outline"
-                  style={{ marginBottom: 16, fontSize: "0.82rem", padding: "5px 12px" }}
+                  style={{ fontSize: "0.82rem", padding: "4px 10px" }}
                   onClick={() => setStep(1)}
                 >
                   ← Back
                 </button>
-              </>
-            )}
+              )}
+              {typeCfg && (
+                <span className="step-label" style={{ margin: 0 }}>
+                  {isEdit ? "Edit Post" : "Step 2 of 2"} &nbsp;·&nbsp;
+                  <span style={{ color: typeCfg.color, fontWeight: 800 }}>{typeCfg.label}</span>
+                </span>
+              )}
+            </div>
+
             <h1 className="create-post-title">
-              {isEdit ? "Edit Post" : isLostFound ? "Describe the item" : "Create a Post"}
+              {isEdit ? "Edit Post" : isExchange ? "Post an Exchange" : "Describe the item"}
             </h1>
 
             <form id="create-post-form" onSubmit={handleSubmit} noValidate>
@@ -172,19 +193,12 @@ export default function CreatePost() {
                   id="post-category"
                   className={`form-input form-select ${fieldErrors.category ? "input-invalid" : ""}`}
                   value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                    if (e.target.value) setFieldErrors((prev) => ({ ...prev, category: undefined }));
-                  }}
+                  onChange={(e) => { setCategory(e.target.value); setFieldErrors((p) => ({ ...p, category: undefined })); }}
                 >
                   <option value="">Select a category</option>
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
+                  {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
-                {fieldErrors.category && (
-                  <p className="field-error field-error-inline" role="alert">{fieldErrors.category}</p>
-                )}
+                {fieldErrors.category && <p className="field-error field-error-inline">{fieldErrors.category}</p>}
               </div>
 
               {/* Title */}
@@ -196,17 +210,12 @@ export default function CreatePost() {
                   id="post-title"
                   type="text"
                   className={`form-input ${fieldErrors.title ? "input-invalid" : ""}`}
-                  placeholder="e.g. Blue SNU ID Card"
+                  placeholder={isExchange ? "e.g. Scientific Calculator (Casio FX-991)" : "e.g. Blue SNU ID Card"}
                   value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    if (e.target.value.trim()) setFieldErrors((prev) => ({ ...prev, title: undefined }));
-                  }}
+                  onChange={(e) => { setTitle(e.target.value); setFieldErrors((p) => ({ ...p, title: undefined })); }}
                   maxLength={100}
                 />
-                {fieldErrors.title && (
-                  <p className="field-error field-error-inline" role="alert">{fieldErrors.title}</p>
-                )}
+                {fieldErrors.title && <p className="field-error field-error-inline">{fieldErrors.title}</p>}
               </div>
 
               {/* Description */}
@@ -217,18 +226,56 @@ export default function CreatePost() {
                 <textarea
                   id="post-desc"
                   className={`form-input ${fieldErrors.description ? "input-invalid" : ""}`}
-                  style={{ resize: "vertical", minHeight: 100, fontFamily: "var(--font)" }}
-                  placeholder="Describe the item in detail — color, brand, any identifying marks..."
+                  style={{ resize: "vertical", minHeight: 90, fontFamily: "var(--font)" }}
+                  placeholder={isExchange
+                    ? "Describe the item — brand, model, condition..."
+                    : "Color, brand, any identifying marks..."}
                   value={description}
-                  onChange={(e) => {
-                    setDescription(e.target.value);
-                    if (e.target.value.trim()) setFieldErrors((prev) => ({ ...prev, description: undefined }));
-                  }}
+                  onChange={(e) => { setDescription(e.target.value); setFieldErrors((p) => ({ ...p, description: undefined })); }}
                 />
-                {fieldErrors.description && (
-                  <p className="field-error field-error-inline" role="alert">{fieldErrors.description}</p>
-                )}
+                {fieldErrors.description && <p className="field-error field-error-inline">{fieldErrors.description}</p>}
               </div>
+
+              {/* Duration (exchange only — required) */}
+              {isExchange && (
+                <div className="form-group">
+                  <label htmlFor="post-duration" className="form-label">
+                    Duration <span className="required-star">*</span>
+                  </label>
+                  <select
+                    id="post-duration"
+                    className={`form-input form-select ${fieldErrors.durationDays ? "input-invalid" : ""}`}
+                    value={durationDays}
+                    onChange={(e) => { setDurationDays(e.target.value); setFieldErrors((p) => ({ ...p, durationDays: undefined })); }}
+                  >
+                    <option value="">How long do you need/offer this?</option>
+                    {DURATION_OPTIONS.map((d) => (
+                      <option key={d.value} value={d.value}>{d.label}</option>
+                    ))}
+                  </select>
+                  {fieldErrors.durationDays && <p className="field-error field-error-inline">{fieldErrors.durationDays}</p>}
+                </div>
+              )}
+
+              {/* Reason (exchange only — optional) */}
+              {isExchange && (
+                <div className="form-group">
+                  <label htmlFor="post-reason" className="form-label">
+                    {postType === "request" ? "Why do you need this?" : "Any conditions for lending?"}
+                    <span className="optional-label"> (optional)</span>
+                  </label>
+                  <textarea
+                    id="post-reason"
+                    className="form-input"
+                    style={{ resize: "vertical", minHeight: 70, fontFamily: "var(--font)" }}
+                    placeholder={postType === "request"
+                      ? "e.g. Exam on Friday, need it for 2 days..."
+                      : "e.g. Please return in same condition, no food near it..."}
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </div>
+              )}
 
               {/* Location (optional) */}
               <div className="form-group">
@@ -239,44 +286,39 @@ export default function CreatePost() {
                   id="post-location"
                   type="text"
                   className="form-input"
-                  placeholder="Where did you lose/find it? e.g. Near the Library"
+                  placeholder={isExchange ? "Where can you hand off? e.g. Library Gate" : "Where did you lose/find it?"}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
               </div>
 
-              {/* Images (optional) */}
+              {/* Images */}
               <div className="form-group">
-                <label className="form-label">
-                  Images <span className="optional-label">(optional, max 4)</span>
-                </label>
+                <label className="form-label">Images <span className="optional-label">(optional, max 4)</span></label>
                 <ImageUpload images={images} onChange={setImages} maxImages={4} maxSizeMB={5} />
               </div>
 
-              {/* Upload progress */}
               {submitting && uploadProgress > 0 && (
                 <div className="upload-progress-bar" style={{ marginBottom: 12 }}>
                   <div className="upload-progress-fill" style={{ width: `${uploadProgress}%` }} />
                 </div>
               )}
 
-              {/* Supabase / general error */}
-              {error && (
-                <div className="form-error" role="alert" id="post-submit-error">{error}</div>
-              )}
+              {error && <div className="form-error" role="alert">{error}</div>}
 
               <button
                 id="submit-post-btn"
                 type="submit"
                 className="btn btn-primary btn-full btn-lg"
                 disabled={submitting}
-                style={{ marginTop: 8 }}
+                style={{
+                  marginTop: 8,
+                  ...(typeCfg && { background: typeCfg.color, borderColor: typeCfg.color }),
+                }}
               >
                 {submitting
-                  ? images.length > 0
-                    ? `Uploading... ${uploadProgress}%`
-                    : "Posting..."
-                  : isEdit ? "Save Changes" : "Post Item →"}
+                  ? images.length > 0 ? `Uploading... ${uploadProgress}%` : "Posting..."
+                  : isEdit ? "Save Changes" : isExchange ? "Post Exchange →" : "Post Item →"}
               </button>
             </form>
           </>

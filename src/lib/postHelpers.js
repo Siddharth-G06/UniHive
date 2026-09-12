@@ -1,4 +1,5 @@
-﻿import { supabase } from "./supabase";
+import { supabase } from "./supabase";
+export { CATEGORY_ICONS, LOSTFOUND_CATEGORIES as CATEGORIES } from "../constants/categories";
 
 // ─── Time formatting ────────────────────────────────────────────
 /**
@@ -118,17 +119,4 @@ export async function deletePostWithImages(postId, userId, imageUrls = []) {
   return { error: error?.message ?? null };
 }
 
-// ─── Category icons ───────────────────────────────────────────────
-export const CATEGORY_ICONS = {
-  "ID Card": "🪪",
-  "Keys": "🔑",
-  "Wallet": "👛",
-  "Phone": "📱",
-  "Laptop": "💻",
-  "Books": "📚",
-  "Earphones": "🎧",
-  "Water Bottle": "💧",
-  "Others": "📦",
-};
-
-export const CATEGORIES = Object.keys(CATEGORY_ICONS);
+// CATEGORY_ICONS and CATEGORIES are re-exported from constants/categories.js above.
